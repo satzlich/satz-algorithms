@@ -1,6 +1,7 @@
 // Copyright 2024 Lie Yan
 
 /// Given two positive integers m and n, find their greatest common divisor.
+@inlinable
 public func gcd<T: FixedWidthInteger>(_ m: T, _ n: T) -> T {
     precondition(m > 0 && n > 0)
 
