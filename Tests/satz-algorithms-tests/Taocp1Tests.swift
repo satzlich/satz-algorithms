@@ -1,6 +1,6 @@
 // Copyright 2024 Lie Yan
 
-@testable import satz_algorithms
+import satz_algorithms
 import XCTest
 
 final class Taocp1Tests: XCTestCase {
