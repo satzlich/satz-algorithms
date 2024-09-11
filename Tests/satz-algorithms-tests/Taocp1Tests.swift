@@ -21,15 +21,11 @@ final class Taocp1Tests: XCTestCase {
             XCTAssertEqual(a * m + b * n, d)
         }
 
-        for (m, n) in [(119, 544), (544, 119)] {
+        for (m, n, dd) in [(119, 544, 17), (544, 119, 17),
+                           (2166, 6099, 57), (6099, 2166, 57)]
+        {
             let (d, a, b) = gcd_extended(m, n)
-            XCTAssertEqual(d, 17)
-            XCTAssertEqual(a * m + b * n, d)
-        }
-
-        for (m, n) in [(2166, 6099), (6099, 2166)] {
-            let (d, a, b) = gcd_extended(m, n)
-            XCTAssertEqual(d, 57)
+            XCTAssertEqual(d, dd)
             XCTAssertEqual(a * m + b * n, d)
         }
     }
