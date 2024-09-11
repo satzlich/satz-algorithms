@@ -10,14 +10,11 @@ public func gcd<T>(_ m: T, _ n: T) -> T
     var n = n
 
     while true {
-        m = m % n
-        if m == 0 {
+        let r = m % n
+        if r == 0 {
             return n
         }
-        n = n % m
-        if n == 0 {
-            return m
-        }
+        (m, n) = (n, r)
     }
 }
 
@@ -42,13 +39,8 @@ public func gcd_extended<T>(_ m: T, _ n: T) -> (d: T, a: T, b: T)
             return (d, a, b)
         }
 
-        c = d
-        d = r
-        var t = aa
-        aa = a
-        a = t - q * a
-        t = bb
-        bb = b
-        b = t - q * b
+        (c, d) = (d, r)
+        (aa, a) = (a, aa - q * a)
+        (bb, b) = (b, bb - q * b)
     }
 }
