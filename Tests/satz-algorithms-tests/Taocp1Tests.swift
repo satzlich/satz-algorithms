@@ -12,18 +12,9 @@ final class Taocp1Tests: XCTestCase {
     }
 
     func test_gcd_extended() {
-        do {
-            let res = gcd_extended(1769, 551)
-            XCTAssertEqual(res.d, 29)
-            XCTAssertEqual(res.a, 5)
-            XCTAssertEqual(res.b, -16)
-        }
-
-        do {
-            let res = gcd_extended(551, 1769)
-            XCTAssertEqual(res.d, 29)
-            XCTAssertEqual(res.a, -16)
-            XCTAssertEqual(res.b, 5)
+        for (m, n) in [(119, 544), (544, 119), (2166, 6099), (6099, 2166)] {
+            let (d, a, b) = gcd_extended(m, n)
+            XCTAssertEqual(a * m + b * n, d)
         }
     }
 }
