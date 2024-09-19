@@ -1,16 +1,18 @@
 // Copyright 2024 Lie Yan
 
 import satz_algorithms
-import XCTest
+import Testing
 
-final class IntegerTests: XCTestCase {
+struct IntegerTests {
+    @Test
     func test_next_even() {
-        XCTAssertEqual(next_even(5), 6)
-        XCTAssertEqual(next_even(6), 8)
+        #expect(next_even(5) == 6)
+        #expect(next_even(6) == 8)
     }
 
+    @Test
     func test_next_odd() {
-        XCTAssertEqual(next_odd(5), 7)
-        XCTAssertEqual(next_odd(6), 7)
+        #expect(next_odd(5) == 7)
+        #expect(next_odd(6) == 7)
     }
 }
