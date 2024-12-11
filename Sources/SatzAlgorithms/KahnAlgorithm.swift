@@ -24,6 +24,14 @@ struct KahnAlgorithm<V> where V: Equatable & Hashable {
      3. querying the targets of a vertex.
      */
     struct DynamicDigraph {
+        public var vertices: [Vertex] {
+            []
+        }
+
+        public var edges: [DirectedEdge] {
+            []
+        }
+
         public init(_ edges: [DirectedEdge]) {
         }
 
@@ -39,8 +47,22 @@ struct KahnAlgorithm<V> where V: Equatable & Hashable {
         }
     }
 
-    static func sort(_ edges: [DirectedEdge]) -> [Vertex] {
-        var result = [Vertex]()
-        return result
+    static func sort(_ edges: [DirectedEdge]) -> [Vertex]? {
+        var digraph = DynamicDigraph(edges)
+
+        var L = [Vertex]()
+        var S = digraph.vertices.filter { digraph.inDegree(of: $0) == 0 }
+        while !S.isEmpty {
+            let n = S.removeFirst()
+            L.append(n)
+            for m in digraph.targets(of: n) {
+                digraph.removeEdge(DirectedEdge(n, m))
+                if digraph.inDegree(of: m) == 0 {
+                    S.append(m)
+                }
+            }
+        }
+
+        return digraph.edges.isEmpty ? L : nil
     }
 }
