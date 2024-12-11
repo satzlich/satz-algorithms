@@ -2,18 +2,10 @@
 
 import Foundation
 
-public struct KahnAlgorithm<V> where V: Equatable & Hashable {
-    public typealias Vertex = V
-
-    public struct DirectedEdge {
-        public let source: Vertex
-        public let target: Vertex
-
-        public init(_ source: Vertex, _ target: Vertex) {
-            self.source = source
-            self.target = target
-        }
-    }
+struct KahnAlgorithm<V> where V: Equatable & Hashable {
+    typealias Vertex = V
+    typealias DirectedEdge = TopologicalSorter<V>.DirectedEdge
+    typealias DirectedEdgeUtils = TopologicalSorter<V>.DirectedEdgeUtils
 
     /**
      A dynamic directed graph
@@ -33,17 +25,8 @@ public struct KahnAlgorithm<V> where V: Equatable & Hashable {
             edgeCount == 0
         }
 
-        public init(_ edges: [DirectedEdge]) {
-            let vertices = DynamicDigraph.incidentVertices(edges)
-            self.init(vertices, edges)
-        }
-
-        private static func incidentVertices(_ edges: [DirectedEdge]) -> Set<Vertex> {
-            Set(edges.flatMap { [$0.source, $0.target] })
-        }
-
         public init(_ vertices: Set<Vertex>, _ edges: [DirectedEdge]) {
-            precondition(vertices.isSuperset(of: Self.incidentVertices(edges)))
+            precondition(vertices.isSuperset(of: DirectedEdgeUtils.incidentVertices(edges)))
 
             self.vertices = vertices.map { $0 }
 
@@ -77,19 +60,11 @@ public struct KahnAlgorithm<V> where V: Equatable & Hashable {
         }
     }
 
-    public static func tsort(_ edges: [DirectedEdge]) -> [Vertex]? {
-        var digraph = DynamicDigraph(edges)
-        return tsort(&digraph)
-    }
-
-    public static func tsort(_ vertices: Set<Vertex>,
-                             _ edges: [DirectedEdge]) -> [Vertex]?
+    static func tsort(_ vertices: Set<Vertex>,
+                      _ edges: [DirectedEdge]) -> [Vertex]?
     {
         var digraph = DynamicDigraph(vertices, edges)
-        return tsort(&digraph)
-    }
 
-    static func tsort(_ digraph: inout DynamicDigraph) -> [Vertex]? {
         var L = [Vertex]()
         var S = digraph.vertices.filter { digraph.inDegree(of: $0) == 0 }
         while !S.isEmpty {

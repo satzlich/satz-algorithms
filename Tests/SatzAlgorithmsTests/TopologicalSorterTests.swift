@@ -4,8 +4,8 @@ import Foundation
 import SatzAlgorithms
 import Testing
 
-struct KahnAlgorithmTests {
-    typealias TSorter = KahnAlgorithm<Int>
+struct TopologicalSorterTests {
+    typealias TSorter = TopologicalSorter<Int>
 
     @Test func testAcyclic() {
         let edges: [TSorter.DirectedEdge] = [
