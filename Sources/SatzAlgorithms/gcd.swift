@@ -21,7 +21,7 @@ public func gcd<T>(_ m: T, _ n: T) -> T
 /// Given two positive integers m and n, we compute their greatest common
 /// divisor d, and we also compute two not-necessarily-positive integers a and b
 /// such that am + bn = d.
-public func gcd_extended<T>(_ m: T, _ n: T) -> (d: T, a: T, b: T)
+public func gcdExtended<T>(_ m: T, _ n: T) -> (d: T, a: T, b: T)
     where T: SignedInteger
 {
     precondition(m > 0 && n > 0)
