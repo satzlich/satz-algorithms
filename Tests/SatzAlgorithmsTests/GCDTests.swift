@@ -1,6 +1,6 @@
 // Copyright 2024 Lie Yan
 
-import satz_algorithms
+import SatzAlgorithms
 import Testing
 
 struct GCDTests {
