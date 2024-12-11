@@ -16,7 +16,7 @@ struct GCDTests {
     func test_gcd_extended() {
         do {
             let (m, n) = (1769, 551)
-            let (d, a, b) = gcd_extended(m, n)
+            let (d, a, b) = gcdExtended(m, n)
             #expect(d == 29)
             #expect(a == 5)
             #expect(b == -16)
@@ -26,7 +26,7 @@ struct GCDTests {
         for (m, n, dd) in [(119, 544, 17), (544, 119, 17),
                            (2166, 6099, 57), (6099, 2166, 57)]
         {
-            let (d, a, b) = gcd_extended(m, n)
+            let (d, a, b) = gcdExtended(m, n)
             #expect(d == dd)
             #expect(a * m + b * n == d)
         }
