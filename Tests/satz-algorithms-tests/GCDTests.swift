@@ -3,7 +3,7 @@
 import satz_algorithms
 import Testing
 
-struct Taocp1Tests {
+struct GCDTests {
     @Test
     func test_gcd() {
         #expect(gcd(119, 544) == 17)
