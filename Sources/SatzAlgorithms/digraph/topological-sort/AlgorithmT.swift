@@ -133,6 +133,6 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
     }
 
     static func tsort(_ edges: [Arc]) -> [Vertex]? {
-        tsort(DigraphUtils.incidentVertices(edges), edges)
+        tsort(DigraphUtils.incidentVertices(of: edges), edges)
     }
 }

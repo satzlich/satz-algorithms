@@ -29,7 +29,7 @@ struct DynamicDigraph<V> where V: Equatable & Hashable {
      - Complexity: O(m + n)
      */
     public init(_ vertices: Set<Vertex>, _ edges: [Arc]) {
-        precondition(vertices.isSuperset(of: DigraphUtils.incidentVertices(edges)))
+        precondition(vertices.isSuperset(of: DigraphUtils.incidentVertices(of: edges)))
 
         self.vertices = vertices.map { $0 }
 
