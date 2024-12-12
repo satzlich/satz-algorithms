@@ -5,33 +5,42 @@ import SatzAlgorithms
 import Testing
 
 struct PermutationTests {
-    @Test
-    func testApplyPermutation() {
-        let values = ["A", "B", "C"]
-        let indices = [1, 2, 0]
-        #expect(applyPermutation(values, indices) == ["B", "C", "A"])
+    typealias ApplyPermuation<T> = (_ values: [T], _ indices: [Int]) -> [T]
 
-        do {
-            var values = values
-            var indices = indices
+    static func inplaceFunctionWrapper<T>(
+        _ values: [T],
+        _ indices: [Int]
+    ) -> [T] {
+        precondition(indices.count == values.count)
 
-            applyPermutation(&values, &indices)
-            #expect(values == ["B", "C", "A"])
-        }
+        var values = values
+        var indices = indices
+
+        applyPermutation(&values, &indices)
+        return values
     }
 
-    @Test
-    func testApplyPermutation_2() {
+    static let integerFunctions: [ApplyPermuation<Int>] = [
+        inplaceFunctionWrapper,
+        SatzAlgorithms.applyPermutation,
+    ]
+
+    static let stringFunctions: [ApplyPermuation<String>] = [
+        inplaceFunctionWrapper,
+        SatzAlgorithms.applyPermutation,
+    ]
+
+    @Test(arguments: integerFunctions)
+    static func testApplyPermuation(_ f: ApplyPermuation<Int>) {
         let values = [0, 1, 2, 3]
         let indices = [1, 3, 2, 0]
         #expect(applyPermutation(values, indices) == [1, 3, 2, 0])
+    }
 
-        do {
-            var values = values
-            var indices = indices
-
-            applyPermutation(&values, &indices)
-            #expect(values == [1, 3, 2, 0])
-        }
+    @Test(arguments: stringFunctions)
+    static func testApplyPermuation_2(_ f: ApplyPermuation<String>) {
+        let values = ["A", "B", "C"]
+        let indices = [1, 2, 0]
+        #expect(applyPermutation(values, indices) == ["B", "C", "A"])
     }
 }
