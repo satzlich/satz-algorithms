@@ -13,7 +13,7 @@ struct GCDTests {
     }
 
     @Test
-    func test_gcd_extended() {
+    func test_gcdExtended() {
         do {
             let (m, n) = (1769, 551)
             let (d, a, b) = gcdExtended(m, n)

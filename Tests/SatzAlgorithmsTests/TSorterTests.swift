@@ -4,35 +4,40 @@
 import Foundation
 import Testing
 
-protocol TSorterForTest {
+struct TSorterTypes {
     typealias Vertex = Int
     typealias Arc = SatzAlgorithms.Arc<Int>
 
-    static func tsort(_ vertices: Set<Int>, _ edges: [Arc]) -> [Vertex]?
+    typealias AlgorithmT = SatzAlgorithms.GenericAlgorithmT<Vertex>
+    typealias KahnAlgorithm = SatzAlgorithms.KahnAlgorithm<Vertex>
+    typealias TSorter = SatzAlgorithms.TSorter<Vertex>
+
+    fileprivate static let allCases: [any TSorterForTest.Type] = [
+        AlgorithmT.self,
+        KahnAlgorithm.self,
+        TSorter.self,
+    ]
 }
 
-typealias Arc = SatzAlgorithms.Arc<Int>
-typealias AlgorithmT = SatzAlgorithms.GenericAlgorithmT<Int>
-typealias KahnAlgorithm = SatzAlgorithms.KahnAlgorithm<Int>
-typealias TSorter = SatzAlgorithms.TSorter<Int>
+private protocol TSorterForTest {
+    typealias Vertex = Int
+    typealias Arc = SatzAlgorithms.Arc<Vertex>
 
-extension AlgorithmT: TSorterForTest {
+    static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]?
 }
 
-extension KahnAlgorithm: TSorterForTest {
+extension TSorterTypes.AlgorithmT: TSorterForTest {
 }
 
-extension TSorter: TSorterForTest {
+extension TSorterTypes.KahnAlgorithm: TSorterForTest {
+}
+
+extension TSorterTypes.TSorter: TSorterForTest {
 }
 
 struct TSorterTests {
-    @Test("acyclic",
-          arguments: [
-              AlgorithmT.self,
-              KahnAlgorithm.self,
-              TSorter.self,
-          ] as[any TSorterForTest.Type])
-    func testAcyclic(_ TSorterType: any TSorterForTest.Type) {
+    @Test(arguments: TSorterTypes.allCases)
+    fileprivate static func testAcyclic(_ TSorterType: any TSorterForTest.Type) {
         let edges: [Arc] = [
             .init(1, 2),
             .init(1, 3),
@@ -45,13 +50,8 @@ struct TSorterTests {
         #expect(sorted == [1, 2, 4, 3])
     }
 
-    @Test("cyclic",
-          arguments: [
-              AlgorithmT.self,
-              KahnAlgorithm.self,
-              TSorter.self,
-          ] as[any TSorterForTest.Type])
-    func testCyclic(_ TSorterType: any TSorterForTest.Type) {
+    @Test(arguments: TSorterTypes.allCases)
+    fileprivate func testCyclic(_ TSorterType: any TSorterForTest.Type) {
         let edges: [Arc] = [
             .init(1, 2),
             .init(1, 3),

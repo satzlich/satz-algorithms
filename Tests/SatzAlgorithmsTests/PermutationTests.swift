@@ -4,34 +4,45 @@ import Foundation
 import SatzAlgorithms
 import Testing
 
-struct PermutationTests {
-    @Test
-    func testApplyPermutation() {
-        let values = ["A", "B", "C"]
-        let indices = [1, 2, 0]
-        #expect(applyPermutation(values, indices) == ["B", "C", "A"])
+private struct PermutationFunctions<T> {
+    typealias Function = (_ values: [T], _ indices: [Int]) -> [T]
 
-        do {
-            var values = values
-            var indices = indices
+    static func applyPermutationInplace(
+        _ values: [T],
+        _ indices: [Int]
+    ) -> [T] {
+        precondition(indices.count == values.count)
 
-            applyPermutation(&values, &indices)
-            #expect(values == ["B", "C", "A"])
-        }
+        var values = values
+        var indices = indices
+
+        SatzAlgorithms.applyPermutation(&values, &indices)
+        return values
     }
 
-    @Test
-    func testApplyPermutation_2() {
+    static var allCases: [Function] {
+        [
+            applyPermutationInplace,
+            SatzAlgorithms.applyPermutation,
+        ]
+    }
+}
+
+struct PermutationTests {
+    fileprivate typealias IntegerFunctions = PermutationFunctions<Int>
+    fileprivate typealias StringFunctions = PermutationFunctions<String>
+
+    @Test(arguments: IntegerFunctions.allCases)
+    fileprivate static func testApplyPermuation(_ f: IntegerFunctions.Function) {
         let values = [0, 1, 2, 3]
         let indices = [1, 3, 2, 0]
-        #expect(applyPermutation(values, indices) == [1, 3, 2, 0])
+        #expect(f(values, indices) == [1, 3, 2, 0])
+    }
 
-        do {
-            var values = values
-            var indices = indices
-
-            applyPermutation(&values, &indices)
-            #expect(values == [1, 3, 2, 0])
-        }
+    @Test(arguments: StringFunctions.allCases)
+    fileprivate static func testApplyPermuation(_ f: StringFunctions.Function) {
+        let values = ["A", "B", "C"]
+        let indices = [1, 2, 0]
+        #expect(f(values, indices) == ["B", "C", "A"])
     }
 }

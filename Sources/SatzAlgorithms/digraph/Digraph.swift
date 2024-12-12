@@ -10,7 +10,7 @@ import Foundation
  2. querying in-degrees and out-degrees,
  3. querying the sources and targets of a vertex.
  */
-struct DynamicDigraph<V> where V: Equatable & Hashable {
+struct Digraph<V> where V: Equatable & Hashable {
     public typealias Vertex = V
     public typealias Arc = SatzAlgorithms.Arc<V>
 
@@ -69,6 +69,9 @@ struct DynamicDigraph<V> where V: Equatable & Hashable {
      */
     @discardableResult
     public mutating func removeEdge(_ edge: Arc) -> Arc? {
+        precondition(vertices.contains(edge.source))
+        precondition(vertices.contains(edge.target))
+
         let removed = adjacencyList[edge.source]?.remove(edge.target)
         _ = inverseAdjacencyList[edge.target]?.remove(edge.source)
 
