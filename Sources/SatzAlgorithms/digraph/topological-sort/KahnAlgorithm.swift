@@ -2,6 +2,9 @@
 
 import Foundation
 
+/**
+ Kahn's algorithm for topological sort
+ */
 struct KahnAlgorithm<V> where V: Equatable & Hashable {
     typealias Vertex = V
     typealias Arc = SatzAlgorithms.Arc<V>
