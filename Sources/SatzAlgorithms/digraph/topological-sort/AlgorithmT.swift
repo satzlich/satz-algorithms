@@ -121,18 +121,16 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
         typealias InternalArc = AlgorithmT.Arc
 
         let bimap = BiMap(vertices)
-        let internalEdges =
-            edges.map { edge in
-                InternalArc(bimap.int(edge.source), bimap.int(edge.target))
-            }
 
-        let sorted = AlgorithmT.tsort(vertices.count, internalEdges)?
-            .map { bimap.vertex($0) }
+        let sorted: [Int]?
+        do {
+            let internalEdges =
+                edges.map { edge in
+                    InternalArc(bimap.int(edge.source), bimap.int(edge.target))
+                }
+            sorted = AlgorithmT.tsort(vertices.count, internalEdges)
+        }
 
-        return sorted
-    }
-
-    static func tsort(_ edges: [Arc]) -> [Vertex]? {
-        tsort(DigraphUtils.incidentVertices(of: edges), edges)
+        return sorted?.map { bimap.vertex($0) }
     }
 }
