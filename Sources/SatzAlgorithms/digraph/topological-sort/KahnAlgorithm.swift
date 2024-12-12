@@ -9,6 +9,10 @@ struct KahnAlgorithm<V> where V: Equatable & Hashable {
     typealias Vertex = V
     typealias Arc = SatzAlgorithms.Arc<V>
 
+    /**
+
+     - Complexity: O(m + n)
+     */
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
         var digraph = Digraph(vertices, edges)
 

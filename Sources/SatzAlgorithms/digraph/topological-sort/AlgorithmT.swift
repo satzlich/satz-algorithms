@@ -38,6 +38,7 @@ struct AlgorithmT {
 
      vertices = [1 ... n]
 
+     - Complexity: O(m + n)
      */
     static func tsort(_ n: Int, _ edges: [Arc]) -> [Vertex]? {
         var output: [Vertex] = []
@@ -117,6 +118,10 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
         }
     }
 
+    /**
+
+     - Complexity: O(m + n)
+     */
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
         typealias InternalArc = AlgorithmT.Arc
 

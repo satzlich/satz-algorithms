@@ -8,6 +8,10 @@ public struct TSorter<V> where V: Equatable & Hashable {
 
     private typealias Implementation = GenericAlgorithmT
 
+    /**
+
+     - Complexity: O(m + n)
+     */
     public static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
         precondition(DigraphUtils.validateDigraph(vertices, edges))
         return Implementation.tsort(vertices, edges)
