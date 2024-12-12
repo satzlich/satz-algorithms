@@ -4,10 +4,10 @@ import Foundation
 import SatzAlgorithms
 import Testing
 
-struct PermutationTests {
-    typealias ApplyPermuation<T> = (_ values: [T], _ indices: [Int]) -> [T]
+private struct Functions<T> {
+    typealias Function = (_ values: [T], _ indices: [Int]) -> [T]
 
-    static func applyPermutationWrapper<T>(
+    static func applyPermutationInplace(
         _ values: [T],
         _ indices: [Int]
     ) -> [T] {
@@ -20,25 +20,27 @@ struct PermutationTests {
         return values
     }
 
-    static let integerFunctions: [ApplyPermuation<Int>] = [
-        applyPermutationWrapper,
-        SatzAlgorithms.applyPermutation,
-    ]
+    static var allCases: [Function] {
+        [
+            applyPermutationInplace,
+            SatzAlgorithms.applyPermutation,
+        ]
+    }
+}
 
-    static let stringFunctions: [ApplyPermuation<String>] = [
-        applyPermutationWrapper,
-        SatzAlgorithms.applyPermutation,
-    ]
+struct PermutationTests {
+    fileprivate typealias IntegerFunctions = Functions<Int>
+    fileprivate typealias StringFunctions = Functions<String>
 
-    @Test(arguments: integerFunctions)
-    static func testApplyPermuation(_ f: ApplyPermuation<Int>) {
+    @Test(arguments: IntegerFunctions.allCases)
+    fileprivate static func testApplyPermuation(_ f: IntegerFunctions.Function) {
         let values = [0, 1, 2, 3]
         let indices = [1, 3, 2, 0]
         #expect(f(values, indices) == [1, 3, 2, 0])
     }
 
-    @Test(arguments: stringFunctions)
-    static func testApplyPermuation(_ f: ApplyPermuation<String>) {
+    @Test(arguments: StringFunctions.allCases)
+    fileprivate static func testApplyPermuation(_ f: StringFunctions.Function) {
         let values = ["A", "B", "C"]
         let indices = [1, 2, 0]
         #expect(f(values, indices) == ["B", "C", "A"])
