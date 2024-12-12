@@ -9,7 +9,7 @@ struct AlgorithmT {
     typealias Vertex = Int
     typealias Arc = (source: Int, target: Int)
 
-    struct Node {
+    private struct Node {
         var count: Int
         var top: SUC?
 
@@ -24,7 +24,7 @@ struct AlgorithmT {
         }
     }
 
-    final class SUC {
+    private final class SUC {
         var suc: Vertex
         var next: SUC?
 
@@ -91,6 +91,48 @@ struct AlgorithmT {
             F = nodes[F].qlink
         }
 
-        return N == 0 ? output : nil
+        return N == 0 ? output.dropLast() : nil
+    }
+}
+
+struct GenericAlgorithmT<V> where V: Equatable & Hashable {
+    typealias Vertex = V
+    typealias Arc = SatzAlgorithms.Arc<V>
+
+    private struct BiMap {
+        private let vertext2int: [Vertex: Int]
+        private let int2vertex: [Int: Vertex]
+
+        init(_ vertices: Set<Vertex>) {
+            self.vertext2int = Dictionary(uniqueKeysWithValues: zip(vertices, 1 ... vertices.count))
+            self.int2vertex = Dictionary(uniqueKeysWithValues: zip(1 ... vertices.count, vertices))
+        }
+
+        func vertex(_ n: Int) -> Vertex {
+            int2vertex[n]!
+        }
+
+        func int(_ vertex: Vertex) -> Int {
+            vertext2int[vertex]!
+        }
+    }
+
+    static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
+        typealias InternalArc = AlgorithmT.Arc
+
+        let bimap = BiMap(vertices)
+        let internalEdges =
+            edges.map { edge in
+                InternalArc(bimap.int(edge.source), bimap.int(edge.target))
+            }
+
+        let sorted = AlgorithmT.tsort(vertices.count, internalEdges)?
+            .map { bimap.vertex($0) }
+
+        return sorted
+    }
+
+    static func tsort(_ edges: [Arc]) -> [Vertex]? {
+        tsort(DigraphUtils.incidentVertices(edges), edges)
     }
 }
