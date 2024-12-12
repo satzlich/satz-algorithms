@@ -4,35 +4,39 @@
 import Foundation
 import Testing
 
-private protocol TSorterForTest {
+struct TSorterTypes {
     typealias Vertex = Int
     typealias Arc = SatzAlgorithms.Arc<Int>
 
-    static func tsort(_ vertices: Set<Int>, _ edges: [Arc]) -> [Vertex]?
-}
+    typealias AlgorithmT = SatzAlgorithms.GenericAlgorithmT<Vertex>
+    typealias KahnAlgorithm = SatzAlgorithms.KahnAlgorithm<Vertex>
+    typealias TSorter = SatzAlgorithms.TSorter<Vertex>
 
-private typealias Arc = SatzAlgorithms.Arc<Int>
-private typealias AlgorithmT = SatzAlgorithms.GenericAlgorithmT<Int>
-private typealias KahnAlgorithm = SatzAlgorithms.KahnAlgorithm<Int>
-private typealias TSorter = SatzAlgorithms.TSorter<Int>
-
-extension AlgorithmT: TSorterForTest {
-}
-
-extension KahnAlgorithm: TSorterForTest {
-}
-
-extension TSorter: TSorterForTest {
-}
-
-struct TSorterTests {
-    fileprivate static let tsorterTypes: [any TSorterForTest.Type] = [
+    fileprivate static let allCases: [any TSorterForTest.Type] = [
         AlgorithmT.self,
         KahnAlgorithm.self,
         TSorter.self,
     ]
+}
 
-    @Test(arguments: tsorterTypes)
+private protocol TSorterForTest {
+    typealias Vertex = Int
+    typealias Arc = SatzAlgorithms.Arc<Vertex>
+
+    static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]?
+}
+
+extension TSorterTypes.AlgorithmT: TSorterForTest {
+}
+
+extension TSorterTypes.KahnAlgorithm: TSorterForTest {
+}
+
+extension TSorterTypes.TSorter: TSorterForTest {
+}
+
+struct TSorterTests {
+    @Test(arguments: TSorterTypes.allCases)
     fileprivate static func testAcyclic(_ TSorterType: any TSorterForTest.Type) {
         let edges: [Arc] = [
             .init(1, 2),
@@ -46,7 +50,7 @@ struct TSorterTests {
         #expect(sorted == [1, 2, 4, 3])
     }
 
-    @Test(arguments: tsorterTypes)
+    @Test(arguments: TSorterTypes.allCases)
     fileprivate func testCyclic(_ TSorterType: any TSorterForTest.Type) {
         let edges: [Arc] = [
             .init(1, 2),
