@@ -7,7 +7,7 @@ import Testing
 struct PermutationTests {
     typealias ApplyPermuation<T> = (_ values: [T], _ indices: [Int]) -> [T]
 
-    static func inplaceFunctionWrapper<T>(
+    static func applyPermutationWrapper<T>(
         _ values: [T],
         _ indices: [Int]
     ) -> [T] {
@@ -16,17 +16,17 @@ struct PermutationTests {
         var values = values
         var indices = indices
 
-        applyPermutation(&values, &indices)
+        SatzAlgorithms.applyPermutation(&values, &indices)
         return values
     }
 
     static let integerFunctions: [ApplyPermuation<Int>] = [
-        inplaceFunctionWrapper,
+        applyPermutationWrapper,
         SatzAlgorithms.applyPermutation,
     ]
 
     static let stringFunctions: [ApplyPermuation<String>] = [
-        inplaceFunctionWrapper,
+        applyPermutationWrapper,
         SatzAlgorithms.applyPermutation,
     ]
 
@@ -34,13 +34,13 @@ struct PermutationTests {
     static func testApplyPermuation(_ f: ApplyPermuation<Int>) {
         let values = [0, 1, 2, 3]
         let indices = [1, 3, 2, 0]
-        #expect(applyPermutation(values, indices) == [1, 3, 2, 0])
+        #expect(f(values, indices) == [1, 3, 2, 0])
     }
 
     @Test(arguments: stringFunctions)
-    static func testApplyPermuation_2(_ f: ApplyPermuation<String>) {
+    static func testApplyPermuation(_ f: ApplyPermuation<String>) {
         let values = ["A", "B", "C"]
         let indices = [1, 2, 0]
-        #expect(applyPermutation(values, indices) == ["B", "C", "A"])
+        #expect(f(values, indices) == ["B", "C", "A"])
     }
 }
