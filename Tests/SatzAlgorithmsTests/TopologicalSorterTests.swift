@@ -8,7 +8,7 @@ struct TopologicalSorterTests {
     typealias TSorter = TopologicalSorter<Int>
 
     @Test func testAcyclic() {
-        let edges: [TSorter.DirectedEdge] = [
+        let edges: [TSorter.Arc] = [
             .init(1, 2),
             .init(1, 3),
             .init(2, 3),
@@ -21,7 +21,7 @@ struct TopologicalSorterTests {
     }
 
     @Test func testCyclic() {
-        let edges: [TSorter.DirectedEdge] = [
+        let edges: [TSorter.Arc] = [
             .init(1, 2),
             .init(1, 3),
             .init(2, 3),
