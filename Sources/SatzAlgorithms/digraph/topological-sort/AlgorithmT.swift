@@ -57,7 +57,6 @@ struct AlgorithmT {
 
         // T4 [Scan for zeros]
         var R = 0
-        var F: Int!
         nodes[0].qlink = 0
         for k in 1 ... n {
             if nodes[k].count == 0 {
@@ -65,7 +64,7 @@ struct AlgorithmT {
                 R = k
             }
         }
-        F = nodes[0].qlink
+        var F = nodes[0].qlink
 
         while true {
             // T5 [Output front of queue]
@@ -79,10 +78,11 @@ struct AlgorithmT {
 
             // T6 [Erase relatioins]
             while P != nil {
-                nodes[P!.suc].count -= 1
-                if nodes[P!.suc].count == 0 {
-                    nodes[R].qlink = P!.suc
-                    R = P!.suc
+                let SUC_P = P!.suc
+                nodes[SUC_P].count -= 1
+                if nodes[SUC_P].count == 0 {
+                    nodes[R].qlink = SUC_P
+                    R = SUC_P
                 }
                 P = P!.next
             }
