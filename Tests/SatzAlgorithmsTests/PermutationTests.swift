@@ -4,7 +4,7 @@ import Foundation
 import SatzAlgorithms
 import Testing
 
-private struct Functions<T> {
+private struct PermutationFunctions<T> {
     typealias Function = (_ values: [T], _ indices: [Int]) -> [T]
 
     static func applyPermutationInplace(
@@ -29,8 +29,8 @@ private struct Functions<T> {
 }
 
 struct PermutationTests {
-    fileprivate typealias IntegerFunctions = Functions<Int>
-    fileprivate typealias StringFunctions = Functions<String>
+    fileprivate typealias IntegerFunctions = PermutationFunctions<Int>
+    fileprivate typealias StringFunctions = PermutationFunctions<String>
 
     @Test(arguments: IntegerFunctions.allCases)
     fileprivate static func testApplyPermuation(_ f: IntegerFunctions.Function) {
