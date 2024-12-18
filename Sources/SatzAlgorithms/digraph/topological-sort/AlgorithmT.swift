@@ -77,7 +77,7 @@ struct AlgorithmT {
             N -= 1
             var P = nodes[F].top
 
-            // T6 [Erase relatioins]
+            // T6 [Erase relations]
             while P != nil {
                 let SUC_P = P!.suc
                 nodes[SUC_P].count -= 1

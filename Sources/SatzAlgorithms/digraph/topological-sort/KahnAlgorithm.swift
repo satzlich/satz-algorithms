@@ -29,6 +29,6 @@ struct KahnAlgorithm<V> where V: Equatable & Hashable {
             }
         }
 
-        return !digraph.hasEdges ? L : nil
+        return digraph.edgeCount == 0 ? L : nil
     }
 }

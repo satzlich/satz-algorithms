@@ -26,14 +26,11 @@ private protocol TSorterForTest {
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]?
 }
 
-extension TSorterTypes.AlgorithmT: TSorterForTest {
-}
+extension TSorterTypes.AlgorithmT: TSorterForTest { }
 
-extension TSorterTypes.KahnAlgorithm: TSorterForTest {
-}
+extension TSorterTypes.KahnAlgorithm: TSorterForTest { }
 
-extension TSorterTypes.TSorter: TSorterForTest {
-}
+extension TSorterTypes.TSorter: TSorterForTest { }
 
 struct TSorterTests {
     @Test(arguments: TSorterTypes.allCases)
@@ -45,7 +42,7 @@ struct TSorterTests {
             .init(2, 4),
             .init(4, 3),
         ]
-        let vertices = Set(DigraphUtils.incidentVertices(of: edges))
+        let vertices = DigraphUtils.incidentVertices(of: edges)
         let sorted = TSorterType.tsort(vertices, edges)
         #expect(sorted == [1, 2, 4, 3])
     }
@@ -61,7 +58,7 @@ struct TSorterTests {
             .init(4, 3),
         ]
 
-        let vertices = Set(DigraphUtils.incidentVertices(of: edges))
+        let vertices = DigraphUtils.incidentVertices(of: edges)
         let sorted = TSorterType.tsort(vertices, edges)
         #expect(sorted == nil)
     }
