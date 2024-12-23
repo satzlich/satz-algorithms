@@ -50,7 +50,7 @@ where K: Comparable {
         }
 
         assert(root != nil)
-        _ = makeUniquelyReferenced(&root)
+        makeUnique(&root)
 
         let inserted = root!.insert(Entry(key, value))
         root!.color = .black
@@ -153,12 +153,32 @@ where K: Comparable {
         Swift.print(")", terminator: "")
     }
 
-    func doCount() -> Int {
-        (left?.doCount() ?? 0) + 1 + (right?.doCount() ?? 0)
+    @usableFromInline
+    func clone() -> RBNode {
+        // shallow copy
+        return RBNode(color, left, entry, right)
     }
 
     @usableFromInline
-    func clone() -> RBNode {
+    func with(color: Color) -> RBNode {
+        // shallow copy
+        return RBNode(color, left, entry, right)
+    }
+
+    @usableFromInline
+    func with(left: RBNode?) -> RBNode {
+        // shallow copy
+        return RBNode(color, left, entry, right)
+    }
+
+    @usableFromInline
+    func with(entry: Entry) -> RBNode {
+        // shallow copy
+        return RBNode(color, left, entry, right)
+    }
+
+    @usableFromInline
+    func with(right: RBNode?) -> RBNode {
         // shallow copy
         return RBNode(color, left, entry, right)
     }
@@ -174,7 +194,7 @@ where K: Comparable {
                 left = RBNode(.red, nil, entry, nil)
                 return true
             }
-            _ = makeUniquelyReferenced(&left)
+            makeUnique(&left)
             if left!.insert(entry) {
                 lbalance()
                 return true
@@ -186,7 +206,7 @@ where K: Comparable {
                 right = RBNode(.red, nil, entry, nil)
                 return true
             }
-            _ = makeUniquelyReferenced(&right)
+            makeUnique(&right)
             if right!.insert(entry) {
                 rbalance()
                 return true
@@ -217,15 +237,15 @@ where K: Comparable {
         }
 
         if key < node!.entry.key {
-            _ = makeUniquelyReferenced(&node)
+            makeUnique(&node)
             return node!.delformLeft(key)
         }
         else if key > node!.entry.key {
-            _ = makeUniquelyReferenced(&node)
+            makeUnique(&node)
             return node!.delformRight(key)
         }
         else {
-            RBNode.combine(into: &node, node!.left, node!.right)
+            node = combine(node!.left, node!.right)
             return true
         }
     }
@@ -272,8 +292,8 @@ where K: Comparable {
            right?.color == .red
         {
             color = .red
-            makeUniquelyReferenced(&left)!.color = .black
-            makeUniquelyReferenced(&right)!.color = .black
+            makeUnique(&left)!.color = .black
+            makeUnique(&right)!.color = .black
             return
         }
         else {
@@ -292,8 +312,8 @@ where K: Comparable {
 
         if left?.color == .red {
             if left?.left?.color == .red { // Case 1
-                let l = makeUniquelyReferenced(&left)!
-                let ll = makeUniquelyReferenced(&l.left)!
+                let l = makeUnique(&left)!
+                let ll = makeUnique(&l.left)!
 
                 swap(&entry, &l.entry)
                 (left, right, l.left, l.right)
@@ -304,8 +324,8 @@ where K: Comparable {
                 return
             }
             if left?.right?.color == .red { // Case 2
-                let l = makeUniquelyReferenced(&left)!
-                let lr = makeUniquelyReferenced(&l.right)!
+                let l = makeUnique(&left)!
+                let lr = makeUnique(&l.right)!
 
                 swap(&entry, &lr.entry)
                 (right, l.right, lr.left, lr.right)
@@ -318,8 +338,8 @@ where K: Comparable {
         }
         if right?.color == .red {
             if right?.left?.color == .red { // Case 3
-                let r = makeUniquelyReferenced(&right)!
-                let rl = makeUniquelyReferenced(&r.left)!
+                let r = makeUnique(&right)!
+                let rl = makeUnique(&r.left)!
 
                 swap(&entry, &rl.entry)
                 (left, rl.left, rl.right, r.left)
@@ -331,8 +351,8 @@ where K: Comparable {
                 return
             }
             if right?.right?.color == .red { // Case 4
-                let r = makeUniquelyReferenced(&right)!
-                let rr = makeUniquelyReferenced(&r.right)!
+                let r = makeUnique(&right)!
+                let rr = makeUnique(&r.right)!
 
                 swap(&entry, &r.entry)
                 (left, r.left, r.right, right) = (r, left, r.left, rr)
@@ -350,21 +370,21 @@ where K: Comparable {
 
         if left?.color == .red {
             color = .red
-            makeUniquelyReferenced(&left)!.color = .black
+            makeUnique(&left)!.color = .black
             return
         }
         else if right?.color == .black {
             color = .black // required by `balanceForRemove()`
-            makeUniquelyReferenced(&right)!.color = .red
+            makeUnique(&right)!.color = .red
             balanceForRemove()
             return
         }
         else if right?.color == .red,
                 right?.left?.color == .black
         {
-            let r = makeUniquelyReferenced(&right)!
-            let rl = makeUniquelyReferenced(&r.left)!
-            let rr = makeUniquelyReferenced(&r.right)! // c
+            let r = makeUnique(&right)!
+            let rl = makeUnique(&r.left)!
+            let rr = makeUnique(&r.right)! // c
 
             swap(&entry, &rl.entry)
             (left, rl.left, rl.right, r.left)
@@ -388,22 +408,22 @@ where K: Comparable {
 
         if right?.color == .red {
             color = .red
-            makeUniquelyReferenced(&right)!.color = .black
+            makeUnique(&right)!.color = .black
             return
         }
         else if left?.color == .black {
             color = .black // required by `balanceForRemove()`
-            makeUniquelyReferenced(&left)!.color = .red
+            makeUnique(&left)!.color = .red
             balanceForRemove()
             return
         }
         else if left?.color == .red,
                 left?.right?.color == .black
         {
-            let l = makeUniquelyReferenced(&left)!
-            let lr = makeUniquelyReferenced(&l.right)!
+            let l = makeUnique(&left)!
+            let lr = makeUnique(&l.right)!
             assert(l.left != nil)
-            let ll = makeUniquelyReferenced(&l.left)! // a
+            let ll = makeUnique(&l.left)! // a
 
             swap(&entry, &lr.entry)
             (l.right, right, lr.left, lr.right)
@@ -422,98 +442,54 @@ where K: Comparable {
         preconditionFailure("Unreachable")
     }
 
-    /**
-     Combine left and right, and assign the result to node
-
-     Returns true if the result is non-empty.
-
-     - Invariant: `left` and `right` are unchanged
-     */
-    static func combine(
-        into node: inout RBNode?,
-        _ left: RBNode?,
-        _ right: RBNode?
-    ) {
-        // precondition: node can be multiply referenced
-
+    static func combine(_ left: RBNode?, _ right: RBNode?) -> RBNode? {
         if left == nil {
-            node = right
-            return
+            return right
         }
         if right == nil {
-            node = left
-            return
+            return left
         }
+        switch (left!.color, right!.color) {
+        case (.red, .red):
+            let bc = combine(left!.right, right!.left)
 
-        let l = left!
-        let r = right!
+            if bc?.color == .red {
+                let bb = bc!.left
+                let cc = bc!.right
 
-        if l.color == .black,
-           r.color == .red
-        {
-            node = r.clone()
-            combine(into: &node!.left, left, r.left)
-            return
-        }
-        if l.color == .red,
-           r.color == .black
-        {
-            node = l.clone()
-            combine(into: &node!.right, l.right, right)
-            return
-        }
-        if l.color == .red,
-           r.color == .red
-        {
-            // use `node` for result of `app b c`
-            combine(into: &node, l.right, r.left)
-
-            if node?.color == .red {
-                let bb = node!.left
-                let cc = node!.right
-
-                _ = makeUniquelyReferenced(&node)
-                node!.left = l.clone()
-                node!.right = r.clone()
-                node!.left!.right = bb
-                node!.right!.left = cc
+                return RBNode(bc!.color,
+                              left!.with(right: bb),
+                              bc!.entry,
+                              right!.with(left: cc))
             }
             else {
-                let bc = node
-                node = l.clone()
-                node!.right = r.clone()
-                node!.right!.left = bc
+                return left!.with(right: right!.with(left: bc))
             }
-            return
-        }
-        if l.color == .black,
-           r.color == .black
-        {
-            // use `node` for result of `app b c`
-            combine(into: &node, l.right, r.left)
 
-            if node?.color == .red {
-                let bb = node!.left
-                let cc = node!.right
+        case (.black, .black):
+            let bc = combine(left!.right, right!.left)
 
-                _ = makeUniquelyReferenced(&node)
-                node!.left = l.clone()
-                node!.right = r.clone()
-                node!.left!.right = bb
-                node!.right!.left = cc
+            if bc?.color == .red {
+                let bb = bc!.left
+                let cc = bc!.right
+
+                return RBNode(bc!.color,
+                              left!.with(right: bb),
+                              bc!.entry,
+                              right!.with(left: cc))
             }
             else {
-                let bc = node
-                node = l.clone()
-                node!.right = r.clone()
-                node!.right!.left = bc
-                node!.balanceLeft()
+                let node = left!.with(right: right!.with(left: bc))
+                node.balanceLeft()
+                return node
             }
 
-            return
-        }
+        case (.black, .red):
+            return right!.with(left: combine(left, right!.left))
 
-        preconditionFailure("Unreachable")
+        case (.red, .black):
+            return left!.with(right: combine(left!.right, right))
+        }
     }
 
     // MARK: - Balance for insertion

@@ -1,6 +1,6 @@
 // Copyright 2024 Lie Yan
 
-@testable import SatzAlgorithms
+import SatzAlgorithms
 import Foundation
 import XCTest
 
