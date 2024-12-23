@@ -8,11 +8,12 @@ protocol Clonable {
 }
 
 @usableFromInline
-func makeUniquelyReferenced<T>(_ obj: inout T?) -> T?
+@discardableResult
+func makeUnique<T>(_ object: inout T?) -> T?
 where T: AnyObject & Clonable {
-    precondition(obj != nil)
-    if !isKnownUniquelyReferenced(&obj) {
-        obj = obj!.clone()
+    precondition(object != nil)
+    if !isKnownUniquelyReferenced(&object) {
+        object = object!.clone()
     }
-    return obj
+    return object
 }
