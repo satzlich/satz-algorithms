@@ -61,12 +61,12 @@ where K: Comparable {
     }
 
     @inlinable
-    public mutating func remove(_ key: K) -> Bool {
-        if Node.remove(from: &root, key) {
+    public mutating func remove(_ key: K) -> V? {
+        let value = Node.remove(from: &root, key)
+        if value != nil {
             _count -= 1
-            return true
         }
-        return false
+        return value
     }
 
     /**
@@ -75,24 +75,8 @@ where K: Comparable {
      ([link](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.4380211009))
      */
     @inlinable
-    public func get(_ key: K) -> Entry? {
-        var t = root
-        var candidate: Node? = nil
-
-        while t != nil {
-            if key < t!.entry.key {
-                t = t!.left
-            }
-            else {
-                candidate = t
-                t = t!.right
-            }
-        }
-
-        if candidate != nil && candidate!.entry.key == key {
-            return candidate!.entry
-        }
-        return nil
+    public func get(_ key: K) -> V? {
+        return Node.search(root, key)
     }
 }
 
@@ -130,29 +114,6 @@ where K: Comparable {
         self.right = right
     }
 
-    func print() {
-        Swift.print("(", terminator: "")
-        Swift.print(color == .red ? "R" : "B", terminator: "")
-        Swift.print(" ", terminator: "")
-        if let left = left {
-            left.print()
-        }
-        else {
-            Swift.print("_", terminator: "")
-        }
-        Swift.print(" ", terminator: "")
-        Swift.print("\(entry.key)", terminator: "")
-        Swift.print(" ", terminator: "")
-        if let right = right {
-            right.print()
-        }
-        else {
-            Swift.print("_", terminator: "")
-        }
-        Swift.print(" ", terminator: "")
-        Swift.print(")", terminator: "")
-    }
-
     @usableFromInline
     func clone() -> RBNode {
         // shallow copy
@@ -181,6 +142,31 @@ where K: Comparable {
     func with(right: RBNode?) -> RBNode {
         // shallow copy
         return RBNode(color, left, entry, right)
+    }
+
+    /**
+
+     - SeeAlso: Two-way search in _A note on searching in a binary search tree_
+     ([link](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.4380211009 ))
+     */
+    public static func search(_ root: RBNode?, _ key: K) -> V? {
+        var t: RBNode? = root
+        var candidate: RBNode? = nil
+
+        while t != nil {
+            if key < t!.entry.key {
+                t = t!.left
+            }
+            else {
+                candidate = t
+                t = t!.right
+            }
+        }
+
+        if candidate != nil && candidate!.entry.key == key {
+            return candidate!.entry.value
+        }
+        return nil
     }
 
     // MARK: - Insert
@@ -222,18 +208,18 @@ where K: Comparable {
     // MARK: - Delete
 
     @usableFromInline
-    static func remove(from root: inout RBNode?, _ key: K) -> Bool {
-        let removed = delete(&root, key)
+    static func remove(from root: inout RBNode?, _ key: K) -> V? {
+        let value = delete(&root, key)
         root?.color = .black
-        return removed
+        return value
     }
 
     @usableFromInline
-    static func delete(_ node: inout RBNode?, _ key: K) -> Bool {
+    static func delete(_ node: inout RBNode?, _ key: K) -> V? {
         // node can be multiply referenced
 
         if node == nil {
-            return false
+            return nil
         }
 
         if key < node!.entry.key {
@@ -245,46 +231,48 @@ where K: Comparable {
             return node!.delformRight(key)
         }
         else {
+            let value = node!.entry.value
             node = combine(node!.left, node!.right)
-            return true
+            return value
         }
     }
 
     @usableFromInline
-    func delformLeft(_ key: K) -> Bool {
+    func delformLeft(_ key: K) -> V? {
         // self is uniquely referenced
 
         if left?.color == .black {
-            let removed = Self.delete(&left, key)
+            let value = Self.delete(&left, key)
             balanceLeft()
-            return removed
+            return value
         }
         else {
-            let removed = Self.delete(&left, key)
+            let value = Self.delete(&left, key)
             color = .red
-            return removed
+            return value
         }
     }
 
     @usableFromInline
-    func delformRight(_ key: K) -> Bool {
+    func delformRight(_ key: K) -> V? {
         // self is uniquely referenced
 
         if right?.color == .black {
-            let removed = Self.delete(&right, key)
+            let value = Self.delete(&right, key)
             balanceRight()
-            return removed
+            return value
         }
         else {
-            let removed = Self.delete(&right, key)
+            let value = Self.delete(&right, key)
             color = .red
-            return removed
+            return value
         }
     }
 
     /**
      Balance for remove()
      */
+    @usableFromInline
     func balanceForRemove() {
         // precondition: self is uniquely referenced
 
@@ -303,6 +291,7 @@ where K: Comparable {
         }
     }
 
+    @usableFromInline
     func balance() {
         // precondition: self is uniquely referenced
 
@@ -365,6 +354,7 @@ where K: Comparable {
         // do nothing otherwise
     }
 
+    @usableFromInline
     func balanceLeft() {
         // precondition: self is uniquely referenced
 
@@ -403,6 +393,7 @@ where K: Comparable {
         preconditionFailure("Unreachable")
     }
 
+    @usableFromInline
     func balanceRight() {
         // precondition: self is uniquely referenced
 
@@ -442,6 +433,7 @@ where K: Comparable {
         preconditionFailure("Unreachable")
     }
 
+    @usableFromInline
     static func combine(_ left: RBNode?, _ right: RBNode?) -> RBNode? {
         if left == nil {
             return right
@@ -498,6 +490,7 @@ where K: Comparable {
 
      - SeeAlso: _Purely Functional Data Structures_, Chris Okasaki, page 27.
      */
+    @usableFromInline
     func lbalance() {
         if color == .red {
             return
@@ -530,6 +523,7 @@ where K: Comparable {
         }
     }
 
+    @usableFromInline
     func rbalance() {
         if color == .red {
             return
@@ -560,5 +554,16 @@ where K: Comparable {
                 return
             }
         }
+    }
+}
+
+enum RBTreeUtils {
+    /**
+
+     - SeeAlso: [Proof of Bounds](https://en.wikipedia.org/wiki/Red-black_tree#Proof_of_bounds)
+     */
+    static func heightUpperBound(_ n: Int) -> Int {
+        precondition(n >= 0)
+        return Int(ceil(2 * log2(Double(n + 1))))
     }
 }

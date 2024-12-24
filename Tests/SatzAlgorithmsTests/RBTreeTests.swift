@@ -1,8 +1,9 @@
 // Copyright 2024 Lie Yan
 
-import SatzAlgorithms
 import Foundation
+import SatzAlgorithms
 import XCTest
+import Collections
 
 final class RBTreeTests: XCTestCase {
     func testPersistence() {
@@ -19,21 +20,21 @@ final class RBTreeTests: XCTestCase {
         _ = u.insert(3, "C")
         _ = u.insert(5, "D")
         XCTAssertEqual(u.count, 5)
-        XCTAssertEqual(u.get(3)?.value, "C")
+        XCTAssertEqual(u.get(3), "C")
 
         _ = u.remove(3)
         XCTAssertEqual(u.count, 4)
-        XCTAssertEqual(u.get(3)?.value, nil)
+        XCTAssertEqual(u.get(3), nil)
 
         // insert d
         _ = t.insert(4, "d")
         XCTAssertEqual(t.count, 4)
-        XCTAssertEqual(t.get(3)?.value, "c")
-        
+        XCTAssertEqual(t.get(3), "c")
+
         // remove a
         _ = t.remove(1)
         XCTAssertEqual(t.count, 3)
-        XCTAssertEqual(t.get(1)?.value, nil)
+        XCTAssertEqual(t.get(1), nil)
     }
 
     static func populate(_ s: some Sequence<Int>) -> RBTree<Int, String> {
@@ -44,8 +45,8 @@ final class RBTreeTests: XCTestCase {
         return t
     }
 
-    static func populateDict(_ s: some Sequence<Int>) -> Dictionary<Int, String> {
-        var t = Dictionary<Int, String>()
+    static func populateDict(_ s: some Sequence<Int>) -> TreeDictionary<Int, String> {
+        var t = TreeDictionary<Int, String>()
         for i in s {
             t[i] = String(i)
         }
@@ -53,30 +54,31 @@ final class RBTreeTests: XCTestCase {
     }
 
     func testGet() {
-        let n = 10000
-        let t = Self.populate(0 ..< n)
+        let t = Self.populate(xs)
+
+        // 105ms
         measure {
-            for i in 0 ..< n {
+            for i in ys {
                 _ = t.get(i)
             }
         }
     }
 
     func testGet_Dict() {
-        let n = 10000
-        let t = Self.populateDict(0 ..< n)
-        // 3x faster
+        let t = Self.populateDict(xs)
+
+        // 112ms
         measure {
-            for i in 0 ..< n {
+            for i in ys {
                 _ = t[i]
             }
         }
     }
 
     func testCopy() {
-        let n = 100_000
-        let t = Self.populate(0 ..< n)
+        let t = Self.populate(xs)
 
+        // 2ms
         measure {
             for _ in 0 ..< 100 {
                 var tt = t
@@ -86,10 +88,9 @@ final class RBTreeTests: XCTestCase {
     }
 
     func testCopy_Dict() {
-        let n = 100_000
-        let t = Self.populateDict(0 ..< n)
+        let t = Self.populateDict(xs)
 
-        // 60x slower, can be even worse for larger n
+        // 3ms
         measure {
             for _ in 0 ..< 100 {
                 var tt = t
@@ -98,14 +99,17 @@ final class RBTreeTests: XCTestCase {
         }
     }
 
-    static let n = 10000
+    static let n = 160_000
     let xs = Array(0 ..< n)
+        .shuffled()
+    let ys = Array(0 ..< n)
         .filter { $0 % 2 == 0 }
         .shuffled()
-    let ys = Array(0 ..< n).shuffled()
 
     func testInsert() {
         let t = Self.populate(xs)
+
+        // 230ms
         measure {
             var tt = t
             for y in ys {
@@ -117,7 +121,7 @@ final class RBTreeTests: XCTestCase {
     func testInsert_Dict() {
         let t = Self.populateDict(xs)
 
-        // 6x faster
+        // 215ms
         measure {
             var tt = t
             for y in ys {
@@ -128,26 +132,29 @@ final class RBTreeTests: XCTestCase {
 
     func testRemove() {
         let t = Self.populate(xs)
+
+        // 604ms
         measure {
             var tt = t
             for y in ys {
                 _ = tt.remove(y)
             }
-            XCTAssertEqual(tt.count, 0)
+            XCTAssertEqual(tt.count, Self.n / 2)
         }
-        XCTAssertEqual(t.count, Self.n / 2)
+        XCTAssertEqual(t.count, Self.n)
     }
 
     func testRemove_Dict() {
         let t = Self.populateDict(xs)
-        // 10x faster
+
+        // 493ms
         measure {
             var tt = t
             for y in ys {
                 _ = tt.removeValue(forKey: y)
             }
-            XCTAssertEqual(tt.count, 0)
+            XCTAssertEqual(tt.count, Self.n / 2)
         }
-        XCTAssertEqual(t.count, Self.n / 2)
+        XCTAssertEqual(t.count, Self.n)
     }
 }
