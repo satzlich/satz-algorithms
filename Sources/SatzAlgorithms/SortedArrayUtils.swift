@@ -1,0 +1,107 @@
+// Copyright 2024-2025 Lie Yan
+
+import Foundation
+
+enum SortedArrayUtils {
+    /**
+     Search for the first element in a sorted array that is ordered after `value`.
+
+     If there is no such element, return `array.count`.
+     */
+    @inlinable
+    public static func upper_bound<T>(_ array: [T], _ value: T) -> Int
+    where T: Comparable {
+        upper_bound(array, value, <)
+    }
+
+    /**
+     Search for the first element in a sorted array where comp(value, element) is true.
+
+     If there is no such element, return `array.count`.
+     */
+    @inlinable
+    public static func upper_bound<T, U>(_ array: [T], _ value: U, _ comp: (U, T) -> Bool) -> Int {
+        var first = 0
+        var count = array.count
+
+        while count > 0 {
+            let step = count / 2
+            let it = first + step
+
+            if !comp(value, array[it]) {
+                first = it + 1
+                count -= step + 1
+            }
+            else {
+                count = step
+            }
+        }
+        return first
+    }
+
+    /**
+     Search for the first element in a sorted array that is not ordered before `value`.
+     */
+    @inlinable
+    static func lower_bound<T>(_ array: [T], _ value: T) -> Int
+    where T: Comparable {
+        lower_bound(array, value, <)
+    }
+
+    /**
+     Search for the first element in a sorted array where comp(value, element) is false.
+
+     If there is no such element, return `array.count`.
+     */
+    @inlinable
+    static func lower_bound<T, U>(_ array: [T], _ value: U, _ comp: (T, U) -> Bool) -> Int {
+        var first = 0
+        var count = array.count
+
+        while count > 0 {
+            let step = count / 2
+            let it = first + step
+
+            if comp(array[it], value) {
+                first = it + 1
+                count -= step + 1
+            }
+            else {
+                count = step
+            }
+        }
+        return first
+    }
+
+    @inlinable
+    static func intersect<T>(_ array: [T], _ range: ClosedRange<T>) -> Bool
+    where T: Comparable {
+        // result := T ∩ range ≠ ∅
+        // argmin { T[i] | T[i] >= left } <= argmax { T[i] | T[i] <= right }
+
+        let a = lower_bound(array, range.lowerBound)
+        let b = upper_bound(array, range.upperBound) - 1
+        return a <= b
+    }
+
+    @inlinable
+    static func intersect<T>(_ array: [T], _ range: Range<T>) -> Bool {
+        // result := T ∩ range ≠ ∅
+        // argmin { T[i] | T[i] >= left } <= argmax { T[i] | T[i] < right }
+        let a = lower_bound(array, range.lowerBound)
+        let b = lower_bound(array, range.upperBound) - 1
+        return a <= b
+    }
+
+    @inlinable
+    static func binary_search<T>(_ array: [T], _ value: T) -> Bool
+    where T: Comparable {
+        binary_search(array, value, <)
+    }
+
+    @inlinable
+    static func binary_search<T>(_ array: [T], _ value: T, _ comp: (T, T) -> Bool) -> Bool {
+        let first = lower_bound(array, value, comp)
+        return !(first == array.count) && !(comp(value, array[first]))
+    }
+}
