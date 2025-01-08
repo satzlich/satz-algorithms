@@ -62,7 +62,8 @@ where K: Comparable {
 
     @inlinable
     public mutating func remove(_ key: K) -> V? {
-        let value = Node.remove(from: &root, key)
+        let value = Node.delete(&root, key)
+        root?.color = .black
         if value != nil {
             _count -= 1
         }
@@ -206,13 +207,6 @@ where K: Comparable {
     }
 
     // MARK: - Delete
-
-    @usableFromInline
-    static func remove(from root: inout RBNode?, _ key: K) -> V? {
-        let value = delete(&root, key)
-        root?.color = .black
-        return value
-    }
 
     @usableFromInline
     static func delete(_ node: inout RBNode?, _ key: K) -> V? {
