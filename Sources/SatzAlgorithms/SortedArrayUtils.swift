@@ -22,8 +22,8 @@ public enum SortedArrayUtils {
     @inlinable
     public static func upper_bound<T, U, C>(_ array: C, _ value: U, _ comp: (U, T) -> Bool) -> Int
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
-        var first = 0
-        var count = array.count
+        var first = array.startIndex
+        var count = array.endIndex - array.startIndex
 
         while count > 0 {
             let step = count / 2
@@ -57,8 +57,8 @@ public enum SortedArrayUtils {
     @inlinable
     public static func lower_bound<T, U, C>(_ array: C, _ value: U, _ comp: (T, U) -> Bool) -> Int
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
-        var first = 0
-        var count = array.count
+        var first = array.startIndex
+        var count = array.endIndex - array.startIndex
 
         while count > 0 {
             let step = count / 2
