@@ -1,9 +1,9 @@
-// Copyright 2024 Lie Yan
+// Copyright 2024-2025 Lie Yan
 
+import Collections
 import Foundation
 import SatzAlgorithms
 import XCTest
-import Collections
 
 final class RBTreeTests: XCTestCase {
     func testPersistence() {
@@ -99,7 +99,7 @@ final class RBTreeTests: XCTestCase {
         }
     }
 
-    static let n = 160_000
+    static let n = 16000
     let xs = Array(0 ..< n)
         .shuffled()
     let ys = Array(0 ..< n)

@@ -1,7 +1,7 @@
 // Copyright 2024-2025 Lie Yan
 
-import SatzAlgorithms
 import Foundation
+import SatzAlgorithms
 import Testing
 
 struct SortedArrayTests {
@@ -57,9 +57,14 @@ struct SortedArrayTests {
     @Test
     static func binary_search() {
         let v = [1, 3, 4, 7, 10, 13, 19]
+        let n = v.count
 
         #expect(SortedArrayUtils.binary_search(v, -1) == false)
         #expect(SortedArrayUtils.binary_search(v, 10) == true)
         #expect(SortedArrayUtils.binary_search(v, 11) == false)
+
+        #expect(SortedArrayUtils.binary_search(v, 7) == true)
+        #expect(SortedArrayUtils.binary_search(v[3 ..< n - 2], 7) == true)
+        #expect(SortedArrayUtils.binary_search(v[4 ..< n - 2], 7) == false)
     }
 }
