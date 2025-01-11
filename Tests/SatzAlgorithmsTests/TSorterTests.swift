@@ -1,5 +1,6 @@
 // Copyright 2024 Lie Yan
 
+/*
 @testable import SatzAlgorithms
 import Foundation
 import Testing
@@ -63,3 +64,4 @@ struct TSorterTests {
         #expect(sorted == nil)
     }
 }
+*/

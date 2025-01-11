@@ -20,8 +20,11 @@ extension Satz {
      If there is no such element, return `elements.count`.
      */
     @inlinable
-    public static func upperBound<T, U, C>(_ elements: C, _ value: U,
-                                           _ comp: (U, T) -> Bool) -> Int
+    public static func upperBound<T, U, C>(
+        _ elements: C,
+        _ value: U,
+        _ comp: (U, T) -> Bool
+    ) -> Int
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
         var first = elements.startIndex
         var count = elements.endIndex - elements.startIndex
@@ -56,8 +59,11 @@ extension Satz {
      If there is no such element, return `elements.count`.
      */
     @inlinable
-    public static func lowerBound<T, U, C>(_ elements: C, _ value: U,
-                                           _ comp: (T, U) -> Bool) -> Int
+    public static func lowerBound<T, U, C>(
+        _ elements: C,
+        _ value: U,
+        _ comp: (T, U) -> Bool
+    ) -> Int
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
         var first = elements.startIndex
         var count = elements.endIndex - elements.startIndex
@@ -105,8 +111,11 @@ extension Satz {
     }
 
     @inlinable
-    public static func binarySearch<T, C>(_ elements: C, _ value: T,
-                                          _ comp: (T, T) -> Bool) -> Bool
+    public static func binarySearch<T, C>(
+        _ elements: C,
+        _ value: T,
+        _ comp: (T, T) -> Bool
+    ) -> Bool
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
         let first = lowerBound(elements, value, comp)
         return !(first == elements.count) && !(comp(value, elements[first]))
