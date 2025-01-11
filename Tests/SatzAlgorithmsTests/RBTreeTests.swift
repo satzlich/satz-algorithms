@@ -56,7 +56,6 @@ final class RBTreeTests: XCTestCase {
     func testGet() {
         let t = Self.populate(xs)
 
-        // 105ms
         measure {
             for i in ys {
                 _ = t.get(i)
@@ -67,7 +66,6 @@ final class RBTreeTests: XCTestCase {
     func testGet_Dict() {
         let t = Self.populateDict(xs)
 
-        // 112ms
         measure {
             for i in ys {
                 _ = t[i]
@@ -78,7 +76,6 @@ final class RBTreeTests: XCTestCase {
     func testCopy() {
         let t = Self.populate(xs)
 
-        // 2ms
         measure {
             for _ in 0 ..< 100 {
                 var tt = t
@@ -90,7 +87,6 @@ final class RBTreeTests: XCTestCase {
     func testCopy_Dict() {
         let t = Self.populateDict(xs)
 
-        // 3ms
         measure {
             for _ in 0 ..< 100 {
                 var tt = t
@@ -99,7 +95,7 @@ final class RBTreeTests: XCTestCase {
         }
     }
 
-    static let n = 16000
+    static let n = 160_000
     let xs = Array(0 ..< n)
         .shuffled()
     let ys = Array(0 ..< n)
@@ -109,7 +105,6 @@ final class RBTreeTests: XCTestCase {
     func testInsert() {
         let t = Self.populate(xs)
 
-        // 230ms
         measure {
             var tt = t
             for y in ys {
@@ -121,7 +116,6 @@ final class RBTreeTests: XCTestCase {
     func testInsert_Dict() {
         let t = Self.populateDict(xs)
 
-        // 215ms
         measure {
             var tt = t
             for y in ys {
@@ -133,7 +127,6 @@ final class RBTreeTests: XCTestCase {
     func testRemove() {
         let t = Self.populate(xs)
 
-        // 604ms
         measure {
             var tt = t
             for y in ys {
@@ -147,7 +140,6 @@ final class RBTreeTests: XCTestCase {
     func testRemove_Dict() {
         let t = Self.populateDict(xs)
 
-        // 493ms
         measure {
             var tt = t
             for y in ys {

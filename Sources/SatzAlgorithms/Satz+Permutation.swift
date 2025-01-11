@@ -4,6 +4,7 @@ import Foundation
 
 extension Satz {
     /** Apply permutation */
+    @inlinable
     public static func applyPermutation<T>(_ values: [T], _ indices: [Int]) -> [T] {
         precondition(indices.count == values.count)
         return indices.map { values[$0] }
@@ -14,6 +15,7 @@ extension Satz {
 
      - SeeAlso: https://devblogs.microsoft.com/oldnewthing/20170102-00/?p=95095
      */
+    @inlinable
     public static func applyPermutation<T>(_ values: inout [T], _ indices: inout [Int]) {
         precondition(indices.count == values.count)
 
