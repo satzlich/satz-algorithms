@@ -16,14 +16,14 @@ private struct PermutationFunctions<T> {
         var values = values
         var indices = indices
 
-        SatzAlgorithms.applyPermutation(&values, &indices)
+        Satz.applyPermutation(&values, &indices)
         return values
     }
 
     static var allCases: [Function] {
         [
             applyPermutationInplace,
-            SatzAlgorithms.applyPermutation,
+            Satz.applyPermutation,
         ]
     }
 }
