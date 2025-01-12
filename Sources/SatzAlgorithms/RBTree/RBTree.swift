@@ -92,7 +92,7 @@ extension RBTree._Node {
     @inlinable
     var _color: _Color {
         @inline(__always) get { object._color }
-        @inline(__always) set { object._color = newValue }
+        @inline(__always) _modify { yield &object._color }
     }
 
     @inlinable
@@ -110,7 +110,7 @@ extension RBTree._Node {
     @inlinable
     var _entry: _Entry {
         @inline(__always) get { object._entry }
-        @inline(__always) set { object._entry = newValue }
+        @inline(__always) _modify { yield &object._entry }
     }
 
     @inlinable

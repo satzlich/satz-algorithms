@@ -107,7 +107,7 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
     @usableFromInline typealias Arc = SatzAlgorithms.Arc<V>
 
     @usableFromInline
-    struct _BiMap {
+    struct _IdMap {
         @usableFromInline let _vertext2id: [Vertex: Int]
         @usableFromInline let _id2vertex: [Int: Vertex]
 
@@ -119,7 +119,7 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
         }
 
         @inlinable
-        func vertex(of id: Int) -> Vertex { _id2vertex[id]! }
+        func vertex(for id: Int) -> Vertex { _id2vertex[id]! }
 
         @inlinable
         func id(of vertex: Vertex) -> Int { _vertext2id[vertex]! }
@@ -133,10 +133,10 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
         typealias Arc = _AlgorithmT.Arc
 
-        let bimap = _BiMap(vertices)
-        let edges = edges.map { Arc(bimap.id(of: $0.source), bimap.id(of: $0.target)) }
+        let map = _IdMap(vertices)
+        let edges = edges.map { Arc(map.id(of: $0.source), map.id(of: $0.target)) }
         let sorted = _AlgorithmT.tsort(vertices.count, edges)
 
-        return sorted?.map { bimap.vertex(of: $0) }
+        return sorted?.map { map.vertex(for: $0) }
     }
 }

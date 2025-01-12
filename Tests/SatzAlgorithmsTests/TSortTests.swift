@@ -13,7 +13,7 @@ private let tsortFunctions: [TSortFunction<Int>] = [
     Satz.KanhAlgorithm.tsort,
 ]
 
-struct TSorterTests {
+struct TSortTests {
     @Test(arguments: tsortFunctions)
     fileprivate static func testAcyclic(_ tsort: TSortFunction<Int>) {
         let edges: [Arc] = [
