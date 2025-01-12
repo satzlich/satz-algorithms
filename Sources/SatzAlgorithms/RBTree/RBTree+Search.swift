@@ -5,7 +5,7 @@ import Foundation
 extension RBTree {
     @inlinable
     public func get(_ key: K) -> V? {
-        _Node.search(_root, key)
+        _Node.twoWaySearch(_root, key)
     }
 }
 
@@ -15,7 +15,7 @@ extension RBTree._Node {
      https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.4380211009)
      */
     @inlinable
-    static func search(_ root: Self?, _ key: K) -> V? {
+    static func twoWaySearch(_ root: Self?, _ key: K) -> V? {
         var t: Self? = root
         var candidate: Self?
 

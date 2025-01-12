@@ -118,6 +118,6 @@ extension Satz {
     ) -> Bool
     where C: RandomAccessCollection, C.Element == T, C.Index == Int {
         let first = lowerBound(elements, value, comp)
-        return !(first == elements.count) && !(comp(value, elements[first]))
+        return !(first == elements.endIndex) && !(comp(value, elements[first]))
     }
 }

@@ -1,34 +1,38 @@
-// Copyright 2024 Lie Yan
+// Copyright 2024-2025 Lie Yan
 
 import Foundation
 
-/**
- Algorithm T for topological sort (TAOCP 2.2.3)
- */
-struct AlgorithmT {
-    typealias Vertex = Int
-    typealias Arc = (source: Int, target: Int)
+/** Algorithm T for topological sort (TAOCP 2.2.3) */
+@usableFromInline
+struct _AlgorithmT {
+    @usableFromInline typealias Vertex = Int
+    @usableFromInline typealias Arc = (source: Int, target: Int)
 
-    private struct Node {
-        var count: Int
-        var top: SUC?
+    @usableFromInline
+    struct _Node {
+        @usableFromInline var count: Int
+        @usableFromInline var top: _SUC?
 
+        @inlinable
         var qlink: Vertex {
-            get {
-                count
-            }
+            get { count }
+            set { count = newValue }
+        }
 
-            set {
-                count = newValue
-            }
+        @inlinable
+        init(count: Int, top: _SUC? = nil) {
+            self.count = count
+            self.top = top
         }
     }
 
-    private final class SUC {
-        var suc: Vertex
-        var next: SUC?
+    @usableFromInline
+    final class _SUC { // Successor
+        @usableFromInline var suc: Vertex
+        @usableFromInline var next: _SUC?
 
-        init(suc: Vertex, next: SUC? = nil) {
+        @inlinable
+        init(suc: Vertex, next: _SUC? = nil) {
             self.suc = suc
             self.next = next
         }
@@ -40,19 +44,20 @@ struct AlgorithmT {
 
      - Complexity: O(m + n)
      */
+    @inlinable
     static func tsort(_ n: Int, _ edges: [Arc]) -> [Vertex]? {
         var output: [Vertex] = []
 
         // T1 [Initialize]
         var nodes =
             // NOTE: Iterate over [0 ... n] instead of [1 ... n]
-            (0 ... n).map { _ in Node(count: 0, top: nil) }
+            (0 ... n).map { _ in _Node(count: 0, top: nil) }
         var N = n
 
         // T2 - T3 [Record the realtion]
         for (j, k) in edges {
             nodes[k].count += 1
-            let p = SUC(suc: k, next: nodes[j].top)
+            let p = _SUC(suc: k, next: nodes[j].top)
             nodes[j].top = p
         }
 
@@ -96,45 +101,42 @@ struct AlgorithmT {
     }
 }
 
+@usableFromInline
 struct GenericAlgorithmT<V> where V: Equatable & Hashable {
-    typealias Vertex = V
-    typealias Arc = SatzAlgorithms.Arc<V>
+    @usableFromInline typealias Vertex = V
+    @usableFromInline typealias Arc = SatzAlgorithms.Arc<V>
 
-    private struct BiMap {
-        private let vertext2int: [Vertex: Int]
-        private let int2vertex: [Int: Vertex]
+    @usableFromInline
+    struct _BiMap {
+        @usableFromInline let _vertext2int: [Vertex: Int]
+        @usableFromInline let _int2vertex: [Int: Vertex]
 
+        @inlinable
         init(_ vertices: Set<Vertex>) {
-            self.vertext2int = Dictionary(uniqueKeysWithValues: zip(vertices, 1 ... vertices.count))
-            self.int2vertex = Dictionary(uniqueKeysWithValues: zip(1 ... vertices.count, vertices))
+            self._vertext2int = Dictionary(uniqueKeysWithValues: zip(vertices, 1 ... vertices.count))
+            self._int2vertex = Dictionary(uniqueKeysWithValues: zip(1 ... vertices.count, vertices))
         }
 
-        func vertex(_ n: Int) -> Vertex {
-            int2vertex[n]!
-        }
+        @inlinable
+        func vertex(_ n: Int) -> Vertex { _int2vertex[n]! }
 
-        func int(_ vertex: Vertex) -> Int {
-            vertext2int[vertex]!
-        }
+        @inlinable
+        func int(_ vertex: Vertex) -> Int { _vertext2int[vertex]! }
     }
 
     /**
 
      - Complexity: O(m + n)
      */
+    @inlinable
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
-        typealias InternalArc = AlgorithmT.Arc
+        typealias InternalArc = _AlgorithmT.Arc
 
-        let bimap = BiMap(vertices)
-
-        let sorted: [Int]?
-        do {
-            let internalEdges =
-                edges.map { edge in
-                    InternalArc(bimap.int(edge.source), bimap.int(edge.target))
-                }
-            sorted = AlgorithmT.tsort(vertices.count, internalEdges)
+        let bimap = _BiMap(vertices)
+        let internalEdges = edges.map { edge in
+            InternalArc(bimap.int(edge.source), bimap.int(edge.target))
         }
+        let sorted = _AlgorithmT.tsort(vertices.count, internalEdges)
 
         return sorted?.map { bimap.vertex($0) }
     }
