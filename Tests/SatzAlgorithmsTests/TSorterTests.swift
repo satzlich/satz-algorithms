@@ -1,41 +1,21 @@
-// Copyright 2024 Lie Yan
+// Copyright 2024-2025 Lie Yan
 
-/*
-@testable import SatzAlgorithms
 import Foundation
+import SatzAlgorithms
 import Testing
 
-struct TSorterTypes {
-    typealias Vertex = Int
-    typealias Arc = SatzAlgorithms.Arc<Int>
+private typealias TSortFunction<V> = (_ vertices: Set<V>, _ edges: [Arc<V>]) -> [V]?
+    where V: Hashable
 
-    typealias AlgorithmT = SatzAlgorithms.GenericAlgorithmT<Vertex>
-    typealias KahnAlgorithm = SatzAlgorithms.KahnAlgorithm<Vertex>
-    typealias TSorter = SatzAlgorithms.TSorter<Vertex>
-
-    fileprivate static let allCases: [any TSorterForTest.Type] = [
-        AlgorithmT.self,
-        KahnAlgorithm.self,
-        TSorter.self,
-    ]
-}
-
-private protocol TSorterForTest {
-    typealias Vertex = Int
-    typealias Arc = SatzAlgorithms.Arc<Vertex>
-
-    static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]?
-}
-
-extension TSorterTypes.AlgorithmT: TSorterForTest { }
-
-extension TSorterTypes.KahnAlgorithm: TSorterForTest { }
-
-extension TSorterTypes.TSorter: TSorterForTest { }
+private let tsortFunctions: [TSortFunction<Int>] = [
+    Satz.tsort,
+    Satz.AlgorithmT.tsort,
+    Satz.KanhAlgorithm.tsort,
+]
 
 struct TSorterTests {
-    @Test(arguments: TSorterTypes.allCases)
-    fileprivate static func testAcyclic(_ TSorterType: any TSorterForTest.Type) {
+    @Test(arguments: tsortFunctions)
+    fileprivate static func testAcyclic(_ tsort: TSortFunction<Int>) {
         let edges: [Arc] = [
             .init(1, 2),
             .init(1, 3),
@@ -43,13 +23,13 @@ struct TSorterTests {
             .init(2, 4),
             .init(4, 3),
         ]
-        let vertices = DigraphUtils.incidentVertices(of: edges)
-        let sorted = TSorterType.tsort(vertices, edges)
+        let vertices = Digraph.vertices(of: edges)
+        let sorted = tsort(vertices, edges)
         #expect(sorted == [1, 2, 4, 3])
     }
 
-    @Test(arguments: TSorterTypes.allCases)
-    fileprivate func testCyclic(_ TSorterType: any TSorterForTest.Type) {
+    @Test(arguments: tsortFunctions)
+    fileprivate func testCyclic(_ tsort: TSortFunction<Int>) {
         let edges: [Arc] = [
             .init(1, 2),
             .init(1, 3),
@@ -59,9 +39,8 @@ struct TSorterTests {
             .init(4, 3),
         ]
 
-        let vertices = DigraphUtils.incidentVertices(of: edges)
-        let sorted = TSorterType.tsort(vertices, edges)
+        let vertices = Digraph.vertices(of: edges)
+        let sorted = tsort(vertices, edges)
         #expect(sorted == nil)
     }
 }
-*/

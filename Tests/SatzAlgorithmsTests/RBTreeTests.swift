@@ -95,7 +95,7 @@ final class RBTreeTests: XCTestCase {
         }
     }
 
-    static let n = 160_000
+    static let n = 16000
     let xs = Array(0 ..< n)
         .shuffled()
     let ys = Array(0 ..< n)

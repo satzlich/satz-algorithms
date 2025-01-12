@@ -13,10 +13,12 @@ extension RBTree {
 
         root.ensureUnique()
 
-        let inserted = root.insert(_Entry(key, value))
-        root._color = .black
-        if inserted { _count += 1 }
-        return inserted
+        if root.insert(_Entry(key, value)) {
+            root._color = .black
+            _count += 1
+            return true
+        }
+        return false
     }
 }
 

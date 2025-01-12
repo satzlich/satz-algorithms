@@ -1,18 +1,18 @@
-// Copyright 2024 Lie Yan
+// Copyright 2024-2025 Lie Yan
 
 import Foundation
 
-/**
- Kahn's algorithm for topological sort
- */
+/** Kahn's algorithm for topological sort */
+@usableFromInline
 struct KahnAlgorithm<V> where V: Equatable & Hashable {
-    typealias Vertex = V
-    typealias Arc = SatzAlgorithms.Arc<V>
+    @usableFromInline typealias Vertex = V
+    @usableFromInline typealias Arc = SatzAlgorithms.Arc<V>
 
     /**
 
      - Complexity: O(m + n)
      */
+    @inlinable
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
         var digraph = Digraph(vertices, edges)
 
@@ -29,6 +29,6 @@ struct KahnAlgorithm<V> where V: Equatable & Hashable {
             }
         }
 
-        return digraph.edgeCount == 0 ? L : nil
+        return digraph._edgeCount == 0 ? L : nil
     }
 }

@@ -1,4 +1,4 @@
-// Copyright 2024 Lie Yan
+// Copyright 2024-2025 Lie Yan
 
 import Foundation
 
@@ -11,22 +11,24 @@ import Foundation
  3. querying in-degrees and out-degrees,
  4. querying the sources and targets of a vertex.
  */
-struct Digraph<V> where V: Equatable & Hashable {
+public struct Digraph<V> where V: Equatable & Hashable {
     public typealias Vertex = V
     public typealias Arc = SatzAlgorithms.Arc<V>
 
     public let vertices: [Vertex]
-    private(set) var edgeCount: Int
+    public var edgeCount: Int { _edgeCount }
 
-    private var _adjacencyList: [Vertex: Set<Vertex>]
-    private var _inverseAdjacencyList: [Vertex: Set<Vertex>]
+    @usableFromInline var _edgeCount: Int
+    @usableFromInline var _adjacencyList: [Vertex: Set<Vertex>]
+    @usableFromInline var _inverseAdjacencyList: [Vertex: Set<Vertex>]
 
     /**
 
      - Complexity: O(m + n)
      */
+    @inlinable
     public init(_ vertices: Set<Vertex>, _ edges: [Arc]) {
-        precondition(vertices.isSuperset(of: DigraphUtils.incidentVertices(of: edges)))
+        precondition(vertices.isSuperset(of: Digraph.vertices(of: edges)))
 
         self.vertices = vertices.map { $0 }
 
@@ -39,7 +41,7 @@ struct Digraph<V> where V: Equatable & Hashable {
         self._adjacencyList = adjacencyList
         self._inverseAdjacencyList = inverseAdjacencyList
 
-        self.edgeCount = _adjacencyList.reduce(0) { $0 + $1.value.count }
+        self._edgeCount = _adjacencyList.reduce(0) { $0 + $1.value.count }
     }
 
     /**
@@ -49,6 +51,7 @@ struct Digraph<V> where V: Equatable & Hashable {
      - Complexity: O(1)
      */
     @discardableResult
+    @inlinable
     public mutating func addEdge(_ edge: Arc) -> Bool {
         precondition(vertices.contains(edge.source))
         precondition(vertices.contains(edge.target))
@@ -57,7 +60,7 @@ struct Digraph<V> where V: Equatable & Hashable {
         let _ = _inverseAdjacencyList[edge.target, default: []].insert(edge.source)
 
         if inserted {
-            edgeCount += 1
+            _edgeCount += 1
         }
         return inserted
     }
@@ -69,6 +72,7 @@ struct Digraph<V> where V: Equatable & Hashable {
      - Complexity: O(1)
      */
     @discardableResult
+    @inlinable
     public mutating func removeEdge(_ edge: Arc) -> Bool {
         precondition(vertices.contains(edge.source))
         precondition(vertices.contains(edge.target))
@@ -77,7 +81,7 @@ struct Digraph<V> where V: Equatable & Hashable {
         _ = _inverseAdjacencyList[edge.target]?.remove(edge.source)
 
         if removed != nil {
-            edgeCount -= 1
+            _edgeCount -= 1
             return true
         }
 
@@ -88,6 +92,7 @@ struct Digraph<V> where V: Equatable & Hashable {
 
      - Complexity: O(1)
      */
+    @inlinable
     public func inDegree(of vertex: Vertex) -> Int {
         _inverseAdjacencyList[vertex]?.count ?? 0
     }
@@ -96,6 +101,7 @@ struct Digraph<V> where V: Equatable & Hashable {
 
      - Complexity: O(1)
      */
+    @inlinable
     public func outDegree(of vertex: Vertex) -> Int {
         _adjacencyList[vertex]?.count ?? 0
     }
@@ -104,6 +110,7 @@ struct Digraph<V> where V: Equatable & Hashable {
 
      - Complexity: O(1)
      */
+    @inlinable
     public func sources(of vertex: Vertex) -> Set<Vertex> {
         _inverseAdjacencyList[vertex] ?? []
     }
@@ -112,6 +119,7 @@ struct Digraph<V> where V: Equatable & Hashable {
 
      - Complexity: O(1)
      */
+    @inlinable
     public func targets(of vertex: Vertex) -> Set<Vertex> {
         _adjacencyList[vertex] ?? []
     }
