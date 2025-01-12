@@ -108,20 +108,21 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
 
     @usableFromInline
     struct _BiMap {
-        @usableFromInline let _vertext2int: [Vertex: Int]
-        @usableFromInline let _int2vertex: [Int: Vertex]
+        @usableFromInline let _vertext2id: [Vertex: Int]
+        @usableFromInline let _id2vertex: [Int: Vertex]
 
         @inlinable
         init(_ vertices: Set<Vertex>) {
-            self._vertext2int = Dictionary(uniqueKeysWithValues: zip(vertices, 1 ... vertices.count))
-            self._int2vertex = Dictionary(uniqueKeysWithValues: zip(1 ... vertices.count, vertices))
+            let n = vertices.count
+            self._vertext2id = Dictionary(uniqueKeysWithValues: zip(vertices, 1 ... n))
+            self._id2vertex = Dictionary(uniqueKeysWithValues: zip(1 ... n, vertices))
         }
 
         @inlinable
-        func vertex(_ n: Int) -> Vertex { _int2vertex[n]! }
+        func vertex(of id: Int) -> Vertex { _id2vertex[id]! }
 
         @inlinable
-        func int(_ vertex: Vertex) -> Int { _vertext2int[vertex]! }
+        func id(of vertex: Vertex) -> Int { _vertext2id[vertex]! }
     }
 
     /**
@@ -130,14 +131,12 @@ struct GenericAlgorithmT<V> where V: Equatable & Hashable {
      */
     @inlinable
     static func tsort(_ vertices: Set<Vertex>, _ edges: [Arc]) -> [Vertex]? {
-        typealias InternalArc = _AlgorithmT.Arc
+        typealias Arc = _AlgorithmT.Arc
 
         let bimap = _BiMap(vertices)
-        let internalEdges = edges.map { edge in
-            InternalArc(bimap.int(edge.source), bimap.int(edge.target))
-        }
-        let sorted = _AlgorithmT.tsort(vertices.count, internalEdges)
+        let edges = edges.map { Arc(bimap.id(of: $0.source), bimap.id(of: $0.target)) }
+        let sorted = _AlgorithmT.tsort(vertices.count, edges)
 
-        return sorted?.map { bimap.vertex($0) }
+        return sorted?.map { bimap.vertex(of: $0) }
     }
 }
