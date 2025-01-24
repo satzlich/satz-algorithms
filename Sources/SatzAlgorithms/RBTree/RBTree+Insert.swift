@@ -65,6 +65,7 @@ extension RBTree._Node {
 
         if left._color == .red {
             if left._left?._color == .red { // Case 1
+                assert(left.isUnique() && left.left.isUnique())
                 var l = left
                 var ll = l.left
 
@@ -76,11 +77,13 @@ extension RBTree._Node {
                 return
             }
             if left._right?._color == .red { // Case 2
+                assert(left.isUnique() && left.right.isUnique())
                 var l = left
                 var lr = l.right
 
                 swap(&_entry, &lr._entry)
-                (_right, l._right, lr._left, lr._right) = (lr, lr._left, lr._right, _right)
+                (_right, l._right, lr._left, lr._right) =
+                    (lr, lr._left, lr._right, _right)
                 _color = .red
                 l._color = .black
                 lr._color = .black
@@ -97,18 +100,19 @@ extension RBTree._Node {
 
         if right._color == .red {
             if right._left?._color == .red { // Case 3
+                assert(right.isUnique() && right.left.isUnique())
                 var r = right
                 var rl = r.left
 
                 swap(&_entry, &rl._entry)
                 (_left, rl._left, rl._right, r._left) = (rl, _left, rl._left, rl._right)
-
                 _color = .red
                 r._color = .black
                 rl._color = .black
                 return
             }
             if right._right?._color == .red { // Case 4
+                assert(right.isUnique() && right.right.isUnique())
                 var r = right
                 var rr = r.right
 
