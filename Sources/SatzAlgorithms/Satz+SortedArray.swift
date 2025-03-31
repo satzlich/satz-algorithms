@@ -54,7 +54,7 @@ extension Satz {
     }
 
     /**
-     Search for the first element where `comp(value, element)` is false.
+     Search for the first element where `comp(element, value)` is false.
 
      If there is no such element, return `elements.count`.
      */
