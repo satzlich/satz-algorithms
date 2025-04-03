@@ -97,16 +97,17 @@ struct STSTreeTests {
     stst.insert("fun")
     stst.insert("functor")
 
-    var results: [String] = []
-    
-    stst.enumerate("ft") { word in
-      results.append(word)
-      return true
-    }
-
-    #expect(results.contains("function"))
-    #expect(!results.contains("fun"))
-    #expect(results.contains("functor"))
+    do {
+      var results: [String] = []
+      stst.enumerate("ft") { word in
+        results.append(word)
+        return true
+      }
+      
+      #expect(results.contains("function"))
+      #expect(!results.contains("fun"))
+      #expect(results.contains("functor"))
+    }    
   }
 
 

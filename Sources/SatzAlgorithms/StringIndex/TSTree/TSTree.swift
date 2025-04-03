@@ -45,6 +45,14 @@ public final class TSTree<Value> {
     return queue
   }
 
+  /// Enumerate all key-value paris in alphabetical order.
+  /// - Parameter block: closure to call on each key-value pair. Returns true
+  ///     to continue enumeration, and false to stop.
+  public func enumerateKeysAndValues(_ block: (Key, Value) -> Bool) {
+    var prefix = ""
+    _ = _enumerate(root, &prefix, block)
+  }
+
   /// Returns true if key is contained in the tree.
   public func contains(_ key: String) -> Bool {
     precondition(!key.isEmpty)

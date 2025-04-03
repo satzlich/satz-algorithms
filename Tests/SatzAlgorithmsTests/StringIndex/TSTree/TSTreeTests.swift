@@ -180,4 +180,25 @@ struct TSTreeTests {
     #expect(tree.search(".a.") == ["ban", "bar", "baz", "man"])
     #expect(tree.search(".an") == ["ban", "man"])
   }
+
+  @Test
+  static func test_Enumerate() {
+    let tree = TSTree<Int>()
+
+    tree.insert("apple", 1)
+    tree.insert("app", 2)
+    tree.insert("pine", 3)
+    tree.insert("pineapple", 4)
+
+    var results: [(String, Int)] = []
+    tree.enumerateKeysAndValues { key, value in
+      results.append((key, value))
+      return true
+    }
+
+    #expect(
+      "\(results)" == """
+        [("app", 2), ("apple", 1), ("pine", 3), ("pineapple", 4)]
+        """)
+  }
 }
