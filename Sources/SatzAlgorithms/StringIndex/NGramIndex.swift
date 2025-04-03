@@ -8,8 +8,8 @@ public struct NGramIndex {
   private var index: [String: Set<Int>]
   private(set) var documents: OrderedSet<String>
   private(set) var tombstoneIDs: Set<Int>
-  let n: Int
-  let caseSensitive: Bool
+  public let n: Int
+  public let caseSensitive: Bool
 
   /// Creates a new n-gram index.
   /// - Parameters:
@@ -33,7 +33,7 @@ public struct NGramIndex {
   /// - Note: Returns empty array if query is shorter than `n` or has no matches.
   public func search(_ query: String) -> [String] {
     let normalizedQuery = caseSensitive ? query : query.lowercased()
-    let queryGrams = StringUtils.nGrams(of: normalizedQuery, n: n)
+    let queryGrams = Satz.nGrams(of: normalizedQuery, n: n)
 
     var resultIDs = findMatchingDocumentIDs(for: queryGrams)
     resultIDs.subtract(tombstoneIDs)  // Filter out deleted docs
@@ -74,7 +74,7 @@ public struct NGramIndex {
 
     // normalize text before compute n-grams
     let normalized = caseSensitive ? text : text.lowercased()
-    for gram in StringUtils.nGrams(of: normalized, n: n) {
+    for gram in Satz.nGrams(of: normalized, n: n) {
       index[gram, default: []].insert(docID)
     }
 
@@ -99,7 +99,7 @@ public struct NGramIndex {
     let normalized = caseSensitive ? text : text.lowercased()
 
     // Remove all ngram references
-    for gram in StringUtils.nGrams(of: normalized, n: n) {
+    for gram in Satz.nGrams(of: normalized, n: n) {
       index[gram]?.remove(documentID)
       if index[gram]?.isEmpty == true {
         index.removeValue(forKey: gram)

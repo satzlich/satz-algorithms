@@ -2,8 +2,7 @@
 
 import Foundation
 
-public enum StringUtils {
-  @available(*, deprecated, renamed: "allSubsequences(of:)", message: "in Satz")
+extension Satz {
   /// Generate all (non-empty) subsequences of a string.
   public static func allSubsequences(of string: String) -> [String] {
     var result: [String] = []
@@ -22,7 +21,6 @@ public enum StringUtils {
     return result
   }
 
-  @available(*, deprecated, renamed: "nGrams(of:n:)", message: "in Satz")
   public static func nGrams(of string: String, n: Int) -> Array<String> {
     guard n > 0, string.count >= n else { return [] }
 

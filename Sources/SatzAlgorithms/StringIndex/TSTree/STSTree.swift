@@ -95,7 +95,7 @@ public final class STSTree {
     allWords.insert(word)
 
     // insert subsequence; shuffle for tree balance
-    for subsequence in StringUtils.allSubsequences(of: word).shuffled() {
+    for subsequence in Satz.allSubsequences(of: word).shuffled() {
       insertSubsequence(subsequence, originalWord: word)
     }
   }
@@ -151,7 +151,7 @@ public final class STSTree {
     guard allWords.remove(word) != nil else { return }
 
     // Delete all subsequence entries
-    for subsequence in StringUtils.allSubsequences(of: word) {
+    for subsequence in Satz.allSubsequences(of: word) {
       deleteSubsequence(subsequence, originalWord: word)
     }
   }
