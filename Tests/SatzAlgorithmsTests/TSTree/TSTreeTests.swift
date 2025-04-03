@@ -10,16 +10,16 @@ struct TSTreeTests {
   static func test_Update() {
     let tree = TSTree<Int>()
 
-    // put() and count
-    tree.put("banana", 2)
+    // insert() and count
+    tree.insert("banana", 2)
     #expect(tree.count == 1)
-    tree.put("apple", 1)
+    tree.insert("apple", 1)
     #expect(tree.count == 2)
-    tree.put("orange", 3)
+    tree.insert("orange", 3)
     #expect(tree.count == 3)
-    tree.put("apple", 5)  // repeat "apple"
+    tree.insert("apple", 5)  // repeat "apple"
     #expect(tree.count == 3)
-    tree.put("tomato", 5)
+    tree.insert("tomato", 5)
     #expect(tree.count == 4)
 
     // get() and contains()
@@ -136,43 +136,48 @@ struct TSTreeTests {
     let tree = TSTree<Int>()
 
     // add words that are not prefix-free
-    tree.put("apple", 1)
-    tree.put("app", 2)
-    tree.put("pine", 3)
-    tree.put("pineapple", 4)
-    tree.put("orange", 5)
-    tree.put("or", 6)
-    tree.put("orangejuice", 8)
-    tree.put("banana", 7)
-    tree.put("ban", 9)
-    tree.put("man", 13)
-    tree.put("bar", 10)
-    tree.put("barn", 11)
-    tree.put("baz", 12)
+    tree.insert("apple", 1)
+    tree.insert("app", 2)
+    tree.insert("pine", 3)
+    tree.insert("pineapple", 4)
+    tree.insert("orange", 5)
+    tree.insert("or", 6)
+    tree.insert("orangejuice", 8)
+    tree.insert("banana", 7)
+    tree.insert("ban", 9)
+    tree.insert("man", 13)
+    tree.insert("bar", 10)
+    tree.insert("barn", 11)
+    tree.insert("baz", 12)
 
     // search for longest prefix of a key
-    #expect(tree.longestPrefixOf("orange juice") == "orange")
-    #expect(tree.longestPrefixOf("orangejuice") == "orangejuice")
-    #expect(tree.longestPrefixOf("orangejuic") == "orange")
-    #expect(tree.longestPrefixOf("orang") == "or")
-    #expect(tree.longestPrefixOf("owl") == "")
-    #expect(tree.longestPrefixOf("kiwi") == "")
+    #expect(tree.findPrefix(of: "orange juice") == "orange")
+    #expect(tree.findPrefix(of: "orangejuice") == "orangejuice")
+    #expect(tree.findPrefix(of: "orangejuic") == "orange")
+    #expect(tree.findPrefix(of: "orang") == "or")
+    #expect(tree.findPrefix(of: "owl") == "")
+    #expect(tree.findPrefix(of: "kiwi") == "")
 
     // search for keys with prefix
-    #expect(tree.keysWithPrefix("ap") == ["app", "apple"])
-    #expect(tree.keysWithPrefix("app") == ["app", "apple"])
-    #expect(tree.keysWithPrefix("appl") == ["apple"])
-    #expect(tree.keysWithPrefix("apple") == ["apple"])
-    #expect(tree.keysWithPrefix("apples") == [])
-    #expect(tree.keysWithPrefix("pin") == ["pine", "pineapple"])
-    #expect(tree.keysWithPrefix("pine") == ["pine", "pineapple"])
-    #expect(tree.keysWithPrefix("pineapple") == ["pineapple"])
+    #expect(tree.searchAll(withPrefix: "ap") == ["app", "apple"])
+    #expect(tree.searchAll(withPrefix: "app") == ["app", "apple"])
+    #expect(tree.searchAll(withPrefix: "appl") == ["apple"])
+    #expect(tree.searchAll(withPrefix: "apple") == ["apple"])
+    #expect(tree.searchAll(withPrefix: "apples") == [])
+    #expect(tree.searchAll(withPrefix: "pin") == ["pine", "pineapple"])
+    #expect(tree.searchAll(withPrefix: "pine") == ["pine", "pineapple"])
+    #expect(tree.searchAll(withPrefix: "pineapple") == ["pineapple"])
+    
+    #expect(tree.search(withPrefix: "p") == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "p", maxResults: 2) == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "p", maxResults: 1) == ["pine"])
+    #expect(tree.search(withPrefix: "p", maxResults: 0) == [])
 
     // search for keys that match a pattern
-    #expect(tree.keysThatMatch("ba.") == ["ban", "bar", "baz"])
-    #expect(tree.keysThatMatch("ba..") == ["barn"])
-    #expect(tree.keysThatMatch("ba.n") == ["barn"])
-    #expect(tree.keysThatMatch(".a.") == ["ban", "bar", "baz", "man"])
-    #expect(tree.keysThatMatch(".an") == ["ban", "man"])
+    #expect(tree.search("ba.") == ["ban", "bar", "baz"])
+    #expect(tree.search("ba..") == ["barn"])
+    #expect(tree.search("ba.n") == ["barn"])
+    #expect(tree.search(".a.") == ["ban", "bar", "baz", "man"])
+    #expect(tree.search(".an") == ["ban", "man"])
   }
 }
