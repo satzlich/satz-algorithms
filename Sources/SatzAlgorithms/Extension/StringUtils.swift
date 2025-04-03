@@ -20,4 +20,19 @@ public enum StringUtils {
     backtrack(string.startIndex, "")
     return result
   }
+
+  public static func nGrams(of string: String, n: Int) -> Array<String> {
+    guard n > 0, string.count >= n else { return [] }
+
+    var grams: [String] = []
+    let startIndex = string.startIndex
+
+    for i in 0...(string.count - n) {
+      let begin = string.index(startIndex, offsetBy: i)
+      let end = string.index(begin, offsetBy: n)
+      grams.append(String(string[begin..<end]))
+    }
+
+    return grams
+  }
 }
