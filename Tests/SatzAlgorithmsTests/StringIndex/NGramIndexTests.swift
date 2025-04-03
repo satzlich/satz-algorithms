@@ -55,8 +55,8 @@ struct NGramIndexTests {
     // Given
     var index = NGramIndex(n: 2)
     let id1 = index.addDocument("Swift")
-    let id2 = index.addDocument("Python")
-    let id3 = index.addDocument("Java")
+    index.addDocument("Python")
+    index.addDocument("Java")
 
     // When
     index.delete(documentID: id1)
