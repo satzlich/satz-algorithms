@@ -24,8 +24,10 @@ public final class TSTree<Value> {
     }
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
+
     @inline(__always) @inlinable
     var hasValue: Bool { value != nil }
+
     @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
@@ -44,17 +46,20 @@ public final class TSTree<Value> {
     return queue
   }
 
+  /// Returns true if key is contained in the tree.
   public func contains(_ key: String) -> Bool {
     precondition(!key.isEmpty)
     return get(key) != nil
   }
 
-  /// Returns the value associated with the given key.
+  /// Returns the value associated with given key.
   public func get(_ key: String) -> Value? {
     precondition(!key.isEmpty)
     return _getNode(key)?.value
   }
 
+  /// Return the node that is matched by given key, regardless whether a key
+  /// is stored at the node.
   @usableFromInline
   func _getNode(_ key: String) -> Node? {
     precondition(!key.isEmpty)
@@ -87,17 +92,22 @@ public final class TSTree<Value> {
 
   // MARK: - Insert
 
+  /// Insert key-value pair in the tree. If a value is already stored for the key,
+  /// the old value is replaced.
+  ///
+  /// ## Side Effect
+  /// `self.count` is incremented accordingly.
   public func insert(_ key: String, _ value: Value) {
     precondition(!key.isEmpty)
     root = _insert(root, key, value, key.startIndex)
   }
 
-  /// Inserts the key-value pair into the symbol table, overwriting the old value
-  /// with the new value if the key is already in the tree.
+  /// Inserts the key-value pair into the tree, replacing the old value with the
+  /// new value if the key is already in the tree.
   /// - Returns: The new subtree.
   ///
   /// ## Side Effect
-  ///   `self.count` is incremented if the key is not found and inserted.
+  ///   `self.count` is incremented accordingly.
   private func _insert(
     _ node: Node?, _ key: String, _ value: Value, _ index: String.Index
   ) -> Node {
@@ -123,6 +133,12 @@ public final class TSTree<Value> {
     return node
   }
 
+  // MARK: - Delete
+
+  /// Delete the key (and associated value) from the tree.
+  ///
+  /// ## Side Effects
+  /// `self.count` is decremented accordingly.
   public func delete(_ key: String) {
     precondition(!key.isEmpty)
     let shouldDelete = delete(root, key, key.startIndex)
@@ -131,13 +147,12 @@ public final class TSTree<Value> {
     }
   }
 
-  // MARK: - Delete
-
   /// Deletes the key (and its associated value) from the tree.
+  ///
   /// - Returns: true if the node should be deleted, false otherwise.
   ///
-  /// ## Side Effect
-  ///   `self.count` is decremented if the key is found and deleted.
+  /// ## Side Effects
+  /// `self.count` is decremented accordingly.
   private func delete(_ node: Node?, _ key: String, _ index: String.Index) -> Bool {
     precondition(!key.isEmpty)
 
@@ -211,33 +226,41 @@ public final class TSTree<Value> {
     return query[query.startIndex..<length]
   }
 
+  /// Find keys that match given prefix.
+  /// - Parameters:
+  ///   - prefix: the prefix to match with
+  ///   - maxResults: maximum number of keys to return
+  public func search(withPrefix prefix: String, maxResults n: Int = .max) -> [String] {
+    guard n < self.count else { return _searchAll(withPrefix: prefix) }
+    guard n > 0 else { return [] }
+
+    var results = [String]()
+    enumerate(withPrefix: prefix) { key, value in
+      results.append(key)
+      return results.count < n
+    }
+    return results
+  }
+
   /// Returns all of the keys in the set that start with prefix.
-  public func searchAll(withPrefix prefix: String) -> [String] {
+  private func _searchAll(withPrefix prefix: String) -> [String] {
     precondition(!prefix.isEmpty)
 
     guard let node = _getNode(prefix) else { return [] }
 
     var queue: [String] = []
 
+    // append value if node is matched
     if node.hasValue { queue.append(prefix) }
+
+    // recurse
     var prefix = prefix
     _collect(node.mid, &prefix, &queue)
+
     return queue
   }
 
-  public func search(withPrefix prefix: String, maxResults: Int = 5) -> [String] {
-    var results = [String]()
-
-    guard maxResults > 0 else { return results }
-
-    enumerate(withPrefix: prefix) { key, value in
-      results.append(key)
-      return results.count < maxResults
-    }
-    return results
-  }
-
-  /// Enumerate all the keys in the set that start with prefix.
+  /// Enumerate all the keys in the tree that start with prefix.
   /// - Parameters:
   ///   - prefix: The prefix to search for.
   ///   - block: The closure to execute for each key-value pair. Returns true
@@ -254,7 +277,7 @@ public final class TSTree<Value> {
     _ = _enumerate(node.mid, &prefix, block)
   }
 
-  /// Enumerate all the keys in the set that start with prefix.
+  /// Enumerate all the keys in the tree that start with prefix.
   /// - Parameters:
   ///   - block: The closure to execute for each key-value pair. Returns true
   ///       to continue enumeration, false to stop.
@@ -267,15 +290,15 @@ public final class TSTree<Value> {
   ) -> Bool {
     guard let node else { return true }
 
-    if _enumerate(node.left, &prefix, block) == false { return false }
+    if !_enumerate(node.left, &prefix, block) { return false }
 
     do {
       if let value = node.value {
-        if block(prefix + CollectionOfOne(node.char), value) == false { return false }
+        if !block(prefix + CollectionOfOne(node.char), value) { return false }
       }
       prefix.append(node.char)
       defer { prefix.removeLast() }
-      if _enumerate(node.mid, &prefix, block) == false { return false }
+      if !_enumerate(node.mid, &prefix, block) { return false }
     }
 
     return _enumerate(node.right, &prefix, block)
@@ -294,15 +317,15 @@ public final class TSTree<Value> {
 
   // MARK: - Collect
 
-  /// all keys in subtrie rooted at node with given prefix
+  /// Collect all keys in lexicographic order in the subtree rooted at given node.
   private func _collect(_ node: Node?, _ prefix: inout String, _ queue: inout [String]) {
     guard let node else { return }
 
     _collect(node.left, &prefix, &queue)
 
     do {
-      if node.hasValue { queue.append(prefix + String(node.char)) }
-      prefix.append(String(node.char))
+      if node.hasValue { queue.append(prefix + CollectionOfOne(node.char)) }
+      prefix.append(node.char)
       _collect(node.mid, &prefix, &queue)
       prefix.removeLast()
     }
@@ -310,6 +333,8 @@ public final class TSTree<Value> {
     _collect(node.right, &prefix, &queue)
   }
 
+  /// Collect all keys that match given `prefix ++ pattern[index...]` in the subtree
+  /// rooted at given node.
   private func _collect(
     _ node: Node?, _ prefix: inout String,
     _ pattern: String, _ index: String.Index,
@@ -341,10 +366,10 @@ public final class TSTree<Value> {
       let lastIndex = pattern.index(before: pattern.endIndex)
 
       if index == lastIndex && node.hasValue {
-        queue.append(prefix + String(node.char))
+        queue.append(prefix + CollectionOfOne(node.char))
       }
       else if index < lastIndex {
-        prefix.append(String(node.char))
+        prefix.append(node.char)
         _collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
         prefix.removeLast()
       }

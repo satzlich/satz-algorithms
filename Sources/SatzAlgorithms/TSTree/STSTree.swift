@@ -4,7 +4,7 @@ import Collections
 import Foundation
 
 /// A ternary search tree (TST) that stores subsequences of words.
-public final class SubseqTSTree {
+public final class STSTree {
   internal final class Node {
     var char: Character
     var left: Node?
@@ -25,15 +25,11 @@ public final class SubseqTSTree {
 
   private(set) var root: Node?
   public private(set) var allWords: Set<String>
-  public let ignoringCase: Bool
 
-  /// Creates a new `SubseqTSTree` instance.
-  /// - Parameter ignoringCase: If true, search is case insensitive. Values are
-  ///     received and stored as is.
-  public init(ignoringCase: Bool) {
+  /// Creates a new `STSTree` instance.
+  public init() {
     self.root = nil
     self.allWords = []
-    self.ignoringCase = ignoringCase
   }
 
   public var isEmpty: Bool { allWords.isEmpty }
@@ -41,16 +37,37 @@ public final class SubseqTSTree {
 
   // MARK: - Search
 
+  /// Returns all the words whose subsequence match given pattern.
   public func search(_ pattern: String, maxResults: Int = 5) -> [String] {
+    var results: Array<String> = []
+    search(pattern) { words in
+      let n = min(words.count, maxResults)
+      results.reserveCapacity(n)
+      results.append(contentsOf: words.prefix(n))
+    }
+    return results
+  }
+
+  /// Enumerate all the words whose subsequence match given pattern.
+  public func enumerate(_ pattern: String, using block: (String) -> Bool) {
+    func newBlock(_ words: Set<String>) {
+      for word in words {
+        if !block(word) { return }
+      }
+    }
+    search(pattern, using: newBlock(_:))
+  }
+
+  /// Find the node that match the pattern and call `block(words)`.
+  public func search(_ pattern: String, using block: (Set<String>) -> Void) {
     precondition(!pattern.isEmpty)
 
-    let patternChars = ignoringCase ? pattern.lowercased() : pattern
     var node = root
-    var i = patternChars.startIndex
+    var i = pattern.startIndex
 
-    while i < patternChars.endIndex {
-      guard let currentNode = node else { return [] }
-      let char = patternChars[i]
+    while i < pattern.endIndex {
+      guard let currentNode = node else { return }
+      let char = pattern[i]
       if char < currentNode.char {
         node = currentNode.left
       }
@@ -58,14 +75,14 @@ public final class SubseqTSTree {
         node = currentNode.right
       }
       else {
-        i = patternChars.index(after: i)
-        if i == patternChars.endIndex {
-          return Array(currentNode.words.prefix(maxResults))
+        i = pattern.index(after: i)
+        if i == pattern.endIndex {
+          block(currentNode.words)
+          return
         }
         node = currentNode.mid
       }
     }
-    return []
   }
 
   // MARK: - Insertion
@@ -76,9 +93,9 @@ public final class SubseqTSTree {
     else { return }
 
     allWords.insert(word)
-    let lowerWord = ignoringCase ? word.lowercased() : word
 
-    for subsequence in StringUtils.allSubsequences(of: lowerWord).shuffled() {
+    // insert subsequence; shuffle for tree balance
+    for subsequence in StringUtils.allSubsequences(of: word).shuffled() {
       insertSubsequence(subsequence, originalWord: word)
     }
   }
@@ -127,15 +144,14 @@ public final class SubseqTSTree {
     }
   }
 
-  // MARK: - Enhanced Deletion
+  // MARK: - Deletion
 
   /// Removes a word and all its subsequences from the tree
   public func delete(_ word: String) {
     guard allWords.remove(word) != nil else { return }
-    let lowerWord = ignoringCase ? word.lowercased() : word
 
     // Delete all subsequence entries
-    for subsequence in StringUtils.allSubsequences(of: lowerWord) {
+    for subsequence in StringUtils.allSubsequences(of: word) {
       deleteSubsequence(subsequence, originalWord: word)
     }
   }
