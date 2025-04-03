@@ -24,8 +24,10 @@ public final class TSTree<Value> {
     }
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
+
     @inline(__always) @inlinable
     var hasValue: Bool { value != nil }
+
     @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
@@ -301,8 +303,8 @@ public final class TSTree<Value> {
     _collect(node.left, &prefix, &queue)
 
     do {
-      if node.hasValue { queue.append(prefix + String(node.char)) }
-      prefix.append(String(node.char))
+      if node.hasValue { queue.append(prefix + CollectionOfOne(node.char)) }
+      prefix.append(node.char)
       _collect(node.mid, &prefix, &queue)
       prefix.removeLast()
     }
@@ -341,10 +343,10 @@ public final class TSTree<Value> {
       let lastIndex = pattern.index(before: pattern.endIndex)
 
       if index == lastIndex && node.hasValue {
-        queue.append(prefix + String(node.char))
+        queue.append(prefix + CollectionOfOne(node.char))
       }
       else if index < lastIndex {
-        prefix.append(String(node.char))
+        prefix.append(node.char)
         _collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
         prefix.removeLast()
       }
