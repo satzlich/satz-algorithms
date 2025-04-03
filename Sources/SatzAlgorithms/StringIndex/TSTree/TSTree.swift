@@ -9,14 +9,14 @@ public final class TSTree<Value> {
   public typealias Element = (key: Key, value: Value)
 
   public private(set) var count: Int
-  private var root: Node?
+  private var root: _Node?
 
   @usableFromInline
-  final class Node {
+  final class _Node {
     @usableFromInline var char: Character
-    @usableFromInline var left: Node?
-    @usableFromInline var mid: Node?
-    @usableFromInline var right: Node?
+    @usableFromInline var left: _Node?
+    @usableFromInline var mid: _Node?
+    @usableFromInline var right: _Node?
     @usableFromInline var value: Value?
 
     init(char: Character) {
@@ -60,11 +60,11 @@ public final class TSTree<Value> {
   /// Return the node that is matched by given key, regardless whether a key
   /// is stored at the node.
   @usableFromInline
-  func _getNode(_ key: String) -> Node? {
+  func _getNode(_ key: String) -> _Node? {
     precondition(!key.isEmpty)
     guard let root = root else { return nil }
 
-    var currentNode: Node? = root
+    var currentNode: _Node? = root
     var currentIndex = key.startIndex
     let lastIndex = key.index(before: key.endIndex)
 
@@ -108,13 +108,13 @@ public final class TSTree<Value> {
   /// ## Side Effect
   ///   `self.count` is incremented accordingly.
   private func _insert(
-    _ node: Node?, _ key: String, _ value: Value, _ index: String.Index
-  ) -> Node {
+    _ node: _Node?, _ key: String, _ value: Value, _ index: String.Index
+  ) -> _Node {
     precondition(!key.isEmpty)
 
     let c = key[index]
 
-    let node: Node = node ?? Node(char: c)
+    let node: _Node = node ?? _Node(char: c)
 
     if c < node.char {
       node.left = _insert(node.left, key, value, index)
@@ -152,7 +152,7 @@ public final class TSTree<Value> {
   ///
   /// ## Side Effects
   /// `self.count` is decremented accordingly.
-  private func delete(_ node: Node?, _ key: String, _ index: String.Index) -> Bool {
+  private func delete(_ node: _Node?, _ key: String, _ index: String.Index) -> Bool {
     precondition(!key.isEmpty)
 
     guard let node else { return false }
@@ -285,7 +285,7 @@ public final class TSTree<Value> {
   ///
   @inlinable
   func _enumerate(
-    _ node: Node?, _ prefix: inout String, _ block: (String, Value) -> Bool
+    _ node: _Node?, _ prefix: inout String, _ block: (String, Value) -> Bool
   ) -> Bool {
     guard let node else { return true }
 
@@ -317,7 +317,7 @@ public final class TSTree<Value> {
   // MARK: - Collect
 
   /// Collect all keys in lexicographic order in the subtree rooted at given node.
-  private func _collect(_ node: Node?, _ prefix: inout String, _ queue: inout [String]) {
+  private func _collect(_ node: _Node?, _ prefix: inout String, _ queue: inout [String]) {
     guard let node else { return }
 
     _collect(node.left, &prefix, &queue)
@@ -335,7 +335,7 @@ public final class TSTree<Value> {
   /// Collect all keys that match given `prefix ++ pattern[index...]` in the subtree
   /// rooted at given node.
   private func _collect(
-    _ node: Node?, _ prefix: inout String,
+    _ node: _Node?, _ prefix: inout String,
     _ pattern: String, _ index: String.Index,
     _ queue: inout [String]
   ) {
@@ -382,7 +382,7 @@ public final class TSTree<Value> {
     return lines.joined(separator: "\n")
   }
 
-  private func prettyPrint(_ node: Node?) -> [String] {
+  private func prettyPrint(_ node: _Node?) -> [String] {
     guard let node else { return [] }
 
     let left = prettyPrint(node.left)
