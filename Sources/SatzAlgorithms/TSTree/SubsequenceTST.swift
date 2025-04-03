@@ -19,6 +19,8 @@ final class SubsequenceTST {
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
 
     @inline(__always) var hasValue: Bool { !words.isEmpty }
+
+    @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
   private var root: Node?
@@ -158,7 +160,7 @@ final class SubsequenceTST {
   /// Attempts to prune empty nodes from the tree
   @inline(__always)
   private func tryPrune(node: Node, parentNodes: [Node]) {
-    guard !node.hasValue && !node.hasChild else { return }
+    guard node.isRemoveable else { return }
     var node: Node = node
 
     // Invariant:
@@ -175,7 +177,7 @@ final class SubsequenceTST {
         parent.mid = nil
       }
 
-      guard !parent.hasValue && !parent.hasChild else { break }
+      guard parent.isRemoveable else { break }
       node = parent
     }
 

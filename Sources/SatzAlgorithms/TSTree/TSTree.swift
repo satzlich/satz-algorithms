@@ -24,6 +24,7 @@ public final class TSTree<Value> {
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
     @inline(__always) var hasValue: Bool { value != nil }
+    @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
   public init() {
@@ -55,9 +56,11 @@ public final class TSTree<Value> {
 
       if c < node.char {
         currentNode = node.left
-      } else if c > node.char {
+      }
+      else if c > node.char {
         currentNode = node.right
-      } else {
+      }
+      else {
         if currentIndex == lastIndex {
           return node
         }
@@ -91,11 +94,14 @@ public final class TSTree<Value> {
 
     if c < node.char {
       node.left = _insert(node.left, key, value, index)
-    } else if c > node.char {
+    }
+    else if c > node.char {
       node.right = _insert(node.right, key, value, index)
-    } else if index < key.index(before: key.endIndex) {
+    }
+    else if index < key.index(before: key.endIndex) {
       node.mid = _insert(node.mid, key, value, key.index(after: index))
-    } else {
+    }
+    else {
       if !node.hasValue { count += 1 }
       node.value = value
     }
@@ -131,27 +137,30 @@ public final class TSTree<Value> {
       else {
         return false
       }
-    } else {
+    }
+    else {
       let c = key[index]
       if c < node.char {
         let shouldDelete = delete(node.left, key, index)
         if shouldDelete {
           node.left = nil
-          return !node.hasValue && !node.hasChild
+          return node.isRemoveable
         }
         return false
-      } else if c > node.char {
+      }
+      else if c > node.char {
         let shouldDelete = delete(node.right, key, index)
         if shouldDelete {
           node.right = nil
-          return !node.hasValue && !node.hasChild
+          return node.isRemoveable
         }
         return false
-      } else {
+      }
+      else {
         let shouldDelete = delete(node.mid, key, key.index(after: index))
         if shouldDelete {
           node.mid = nil
-          return !node.hasValue && !node.hasChild
+          return node.isRemoveable
         }
         return false
       }
@@ -170,9 +179,11 @@ public final class TSTree<Value> {
       let c = query[index]
       if c < node.char {
         currentNode = node.left
-      } else if c > node.char {
+      }
+      else if c > node.char {
         currentNode = node.right
-      } else {
+      }
+      else {
         index = query.index(after: index)
         if node.hasValue { length = index }
         currentNode = node.mid
@@ -246,11 +257,14 @@ public final class TSTree<Value> {
       collect(node.left, &prefix, pattern, index, &queue)
       collectMid()
       collect(node.right, &prefix, pattern, index, &queue)
-    } else if c < node.char {
+    }
+    else if c < node.char {
       collect(node.left, &prefix, pattern, index, &queue)
-    } else if c == node.char {
+    }
+    else if c == node.char {
       collectMid()
-    } else if c > node.char {
+    }
+    else if c > node.char {
       collect(node.right, &prefix, pattern, index, &queue)
     }
 
@@ -259,7 +273,8 @@ public final class TSTree<Value> {
 
       if index == lastIndex && node.hasValue {
         queue.append(prefix + String(node.char))
-      } else if index < lastIndex {
+      }
+      else if index < lastIndex {
         prefix.append(String(node.char))
         collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
         prefix.removeLast()
