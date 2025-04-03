@@ -151,28 +151,28 @@ struct TSTreeTests {
     tree.insert("baz", 12)
 
     // search for longest prefix of a key
-    #expect(tree.longestPrefixOf("orange juice") == "orange")
-    #expect(tree.longestPrefixOf("orangejuice") == "orangejuice")
-    #expect(tree.longestPrefixOf("orangejuic") == "orange")
-    #expect(tree.longestPrefixOf("orang") == "or")
-    #expect(tree.longestPrefixOf("owl") == "")
-    #expect(tree.longestPrefixOf("kiwi") == "")
+    #expect(tree.findPrefix(of: "orange juice") == "orange")
+    #expect(tree.findPrefix(of: "orangejuice") == "orangejuice")
+    #expect(tree.findPrefix(of: "orangejuic") == "orange")
+    #expect(tree.findPrefix(of: "orang") == "or")
+    #expect(tree.findPrefix(of: "owl") == "")
+    #expect(tree.findPrefix(of: "kiwi") == "")
 
     // search for keys with prefix
-    #expect(tree.keysWithPrefix("ap") == ["app", "apple"])
-    #expect(tree.keysWithPrefix("app") == ["app", "apple"])
-    #expect(tree.keysWithPrefix("appl") == ["apple"])
-    #expect(tree.keysWithPrefix("apple") == ["apple"])
-    #expect(tree.keysWithPrefix("apples") == [])
-    #expect(tree.keysWithPrefix("pin") == ["pine", "pineapple"])
-    #expect(tree.keysWithPrefix("pine") == ["pine", "pineapple"])
-    #expect(tree.keysWithPrefix("pineapple") == ["pineapple"])
+    #expect(tree.search(withPrefix: "ap") == ["app", "apple"])
+    #expect(tree.search(withPrefix: "app") == ["app", "apple"])
+    #expect(tree.search(withPrefix: "appl") == ["apple"])
+    #expect(tree.search(withPrefix: "apple") == ["apple"])
+    #expect(tree.search(withPrefix: "apples") == [])
+    #expect(tree.search(withPrefix: "pin") == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "pine") == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "pineapple") == ["pineapple"])
 
     // search for keys that match a pattern
-    #expect(tree.keysThatMatch("ba.") == ["ban", "bar", "baz"])
-    #expect(tree.keysThatMatch("ba..") == ["barn"])
-    #expect(tree.keysThatMatch("ba.n") == ["barn"])
-    #expect(tree.keysThatMatch(".a.") == ["ban", "bar", "baz", "man"])
-    #expect(tree.keysThatMatch(".an") == ["ban", "man"])
+    #expect(tree.search("ba.") == ["ban", "bar", "baz"])
+    #expect(tree.search("ba..") == ["barn"])
+    #expect(tree.search("ba.n") == ["barn"])
+    #expect(tree.search(".a.") == ["ban", "bar", "baz", "man"])
+    #expect(tree.search(".an") == ["ban", "man"])
   }
 }

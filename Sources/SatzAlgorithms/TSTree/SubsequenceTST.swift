@@ -16,9 +16,9 @@ final class SubsequenceTST {
       self.char = char
     }
 
-    var hasChild: Bool { left != nil || mid != nil || right != nil }
+    @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
 
-    var hasValue: Bool { !words.isEmpty }
+    @inline(__always) var hasValue: Bool { !words.isEmpty }
   }
 
   private var root: Node?

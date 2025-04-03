@@ -159,7 +159,7 @@ public final class TSTree<Value> {
   }
 
   /// Returns the string in the tree that is the longest prefix of query.
-  public func longestPrefixOf(_ query: String) -> Substring {
+  public func findPrefix(of query: String) -> Substring {
     precondition(!query.isEmpty)
 
     var length: String.Index = query.startIndex
@@ -190,7 +190,7 @@ public final class TSTree<Value> {
   }
 
   /// Returns all of the keys in the set that start with prefix.
-  public func keysWithPrefix(_ prefix: String) -> [String] {
+  public func search(withPrefix prefix: String) -> [String] {
     precondition(!prefix.isEmpty)
 
     guard let node = _getNode(prefix) else { return [] }
@@ -221,7 +221,7 @@ public final class TSTree<Value> {
 
   /// Returns all of the keys in the tree that match the given pattern
   /// where the chaaracter "." is treated as a wildcard character.
-  public func keysThatMatch(_ pattern: String) -> [String] {
+  public func search(_ pattern: String) -> [String] {
     precondition(!pattern.isEmpty)
 
     var queue: [String] = []
