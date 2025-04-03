@@ -15,7 +15,7 @@ public struct NGramIndex {
   /// - Parameters:
   ///   - n: The length of n-grams to use (default: 2).
   ///   - caseSensitive: Whether to distinguish case (default: false).
-  /// - Precondition: `n > 2`
+  /// - Precondition: `n >= 2`
   public init(n: Int = 2, caseSensitive: Bool = false) {
     precondition(n >= 2)
     self.n = n
