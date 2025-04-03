@@ -81,6 +81,12 @@ public struct NGramIndex {
     return docID
   }
 
+  /// Add a list of documents to the index.
+  /// - Complexity: O(m), where m is the length sum of texts.
+  public mutating func addDocuments<S: Sequence>(_ texts: S) where S.Element == String {
+    texts.forEach { self.addDocument($0) }
+  }
+
   // MARK: - Delete
 
   /// Removes a document from the index by its ID
