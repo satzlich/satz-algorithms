@@ -11,25 +11,37 @@ public final class TSTree<Value> {
   public private(set) var count: Int
   private var root: Node?
 
-  private final class Node {
-    var char: Character
-    var left: Node?
-    var mid: Node?
-    var right: Node?
-    var value: Value?
+  @usableFromInline
+  final class Node {
+    @usableFromInline var char: Character
+    @usableFromInline var left: Node?
+    @usableFromInline var mid: Node?
+    @usableFromInline var right: Node?
+    @usableFromInline var value: Value?
 
     init(char: Character) {
       self.char = char
     }
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
-    @inline(__always) var hasValue: Bool { value != nil }
+    @inline(__always) @inlinable
+    var hasValue: Bool { value != nil }
     @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
   public init() {
     self.count = 0
     self.root = nil
+  }
+
+  // MARK: - Get with Key
+
+  /// Returns all keys in the tree.
+  public func keys() -> [String] {
+    var queue: [String] = []
+    var prefix = ""
+    collect(root, &prefix, &queue)
+    return queue
   }
 
   public func contains(_ key: String) -> Bool {
@@ -43,7 +55,8 @@ public final class TSTree<Value> {
     return _getNode(key)?.value
   }
 
-  private func _getNode(_ key: String) -> Node? {
+  @usableFromInline
+  func _getNode(_ key: String) -> Node? {
     precondition(!key.isEmpty)
     guard let root = root else { return nil }
 
@@ -71,6 +84,8 @@ public final class TSTree<Value> {
 
     return nil
   }
+
+  // MARK: - Insert
 
   public func insert(_ key: String, _ value: Value) {
     precondition(!key.isEmpty)
@@ -115,6 +130,8 @@ public final class TSTree<Value> {
       root = nil
     }
   }
+
+  // MARK: - Delete
 
   /// Deletes the key (and its associated value) from the tree.
   /// - Returns: true if the node should be deleted, false otherwise.
@@ -167,6 +184,8 @@ public final class TSTree<Value> {
     }
   }
 
+  // MARK: - Match with Pattern
+
   /// Returns the string in the tree that is the longest prefix of query.
   public func findPrefix(of query: String) -> Substring {
     precondition(!query.isEmpty)
@@ -192,16 +211,8 @@ public final class TSTree<Value> {
     return query[query.startIndex..<length]
   }
 
-  /// Returns all keys in the tree.
-  public func keys() -> [String] {
-    var queue: [String] = []
-    var prefix = ""
-    collect(root, &prefix, &queue)
-    return queue
-  }
-
   /// Returns all of the keys in the set that start with prefix.
-  public func search(withPrefix prefix: String) -> [String] {
+  public func searchAll(withPrefix prefix: String) -> [String] {
     precondition(!prefix.isEmpty)
 
     guard let node = _getNode(prefix) else { return [] }
@@ -213,6 +224,75 @@ public final class TSTree<Value> {
     collect(node.mid, &prefix, &queue)
     return queue
   }
+
+  public func search(withPrefix prefix: String, maxResults: Int = 5) -> [String] {
+    var results = [String]()
+
+    guard maxResults > 0 else { return results }
+
+    enumerate(withPrefix: prefix) { key, value in
+      results.append(key)
+      return results.count < maxResults
+    }
+    return results
+  }
+
+  /// Enumerate all the keys in the set that start with prefix.
+  /// - Parameters:
+  ///   - prefix: The prefix to search for.
+  ///   - block: The closure to execute for each key-value pair. Returns true
+  ///       to continue enumeration, false to stop.
+  @inlinable
+  public func enumerate(withPrefix prefix: String, using block: (String, Value) -> Bool) {
+    precondition(!prefix.isEmpty)
+
+    guard let node = _getNode(prefix) else { return }
+    if let value = node.value {
+      if block(prefix, value) == false { return }
+    }
+    var prefix = prefix
+    _ = _enumerate(node.mid, &prefix, block)
+  }
+
+  /// Enumerate all the keys in the set that start with prefix.
+  /// - Parameters:
+  ///   - block: The closure to execute for each key-value pair. Returns true
+  ///       to continue enumeration, false to stop.
+  /// - Returns: false if block has interrupted enumeration.
+  /// - Precondition: the path to node (node excluded) matches the prefix.
+  ///
+  @inlinable
+  func _enumerate(
+    _ node: Node?, _ prefix: inout String, _ block: (String, Value) -> Bool
+  ) -> Bool {
+    guard let node else { return true }
+
+    if _enumerate(node.left, &prefix, block) == false { return false }
+
+    do {
+      if let value = node.value {
+        if block(prefix + CollectionOfOne(node.char), value) == false { return false }
+      }
+      prefix.append(node.char)
+      defer { prefix.removeLast() }
+      if _enumerate(node.mid, &prefix, block) == false { return false }
+    }
+
+    return _enumerate(node.right, &prefix, block)
+  }
+
+  /// Returns all of the keys in the tree that match the given pattern
+  /// where the chaaracter "." is treated as a wildcard character.
+  public func search(_ pattern: String) -> [String] {
+    precondition(!pattern.isEmpty)
+
+    var queue: [String] = []
+    var prefix = ""
+    collect(root, &prefix, pattern, pattern.startIndex, &queue)
+    return queue
+  }
+
+  // MARK: - Collect
 
   /// all keys in subtrie rooted at node with given prefix
   private func collect(_ node: Node?, _ prefix: inout String, _ queue: inout [String]) {
@@ -228,17 +308,6 @@ public final class TSTree<Value> {
     }
 
     collect(node.right, &prefix, &queue)
-  }
-
-  /// Returns all of the keys in the tree that match the given pattern
-  /// where the chaaracter "." is treated as a wildcard character.
-  public func search(_ pattern: String) -> [String] {
-    precondition(!pattern.isEmpty)
-
-    var queue: [String] = []
-    var prefix = ""
-    collect(root, &prefix, pattern, pattern.startIndex, &queue)
-    return queue
   }
 
   private func collect(
@@ -281,6 +350,8 @@ public final class TSTree<Value> {
       }
     }
   }
+
+  // MARK: - Pretty Print
 
   public func prettyPrint() -> String {
     let lines = prettyPrint(root)

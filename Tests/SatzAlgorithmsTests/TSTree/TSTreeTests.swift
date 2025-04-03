@@ -159,14 +159,19 @@ struct TSTreeTests {
     #expect(tree.findPrefix(of: "kiwi") == "")
 
     // search for keys with prefix
-    #expect(tree.search(withPrefix: "ap") == ["app", "apple"])
-    #expect(tree.search(withPrefix: "app") == ["app", "apple"])
-    #expect(tree.search(withPrefix: "appl") == ["apple"])
-    #expect(tree.search(withPrefix: "apple") == ["apple"])
-    #expect(tree.search(withPrefix: "apples") == [])
-    #expect(tree.search(withPrefix: "pin") == ["pine", "pineapple"])
-    #expect(tree.search(withPrefix: "pine") == ["pine", "pineapple"])
-    #expect(tree.search(withPrefix: "pineapple") == ["pineapple"])
+    #expect(tree.searchAll(withPrefix: "ap") == ["app", "apple"])
+    #expect(tree.searchAll(withPrefix: "app") == ["app", "apple"])
+    #expect(tree.searchAll(withPrefix: "appl") == ["apple"])
+    #expect(tree.searchAll(withPrefix: "apple") == ["apple"])
+    #expect(tree.searchAll(withPrefix: "apples") == [])
+    #expect(tree.searchAll(withPrefix: "pin") == ["pine", "pineapple"])
+    #expect(tree.searchAll(withPrefix: "pine") == ["pine", "pineapple"])
+    #expect(tree.searchAll(withPrefix: "pineapple") == ["pineapple"])
+    
+    #expect(tree.search(withPrefix: "p") == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "p", maxResults: 2) == ["pine", "pineapple"])
+    #expect(tree.search(withPrefix: "p", maxResults: 1) == ["pine"])
+    #expect(tree.search(withPrefix: "p", maxResults: 0) == [])
 
     // search for keys that match a pattern
     #expect(tree.search("ba.") == ["ban", "bar", "baz"])
