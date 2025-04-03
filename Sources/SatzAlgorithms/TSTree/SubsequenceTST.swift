@@ -24,6 +24,33 @@ final class SubsequenceTST {
   private var root: Node?
   private var allWords: Set<String> = []
 
+  // MARK: - Search
+
+  func search(_ pattern: String, maxResults: Int = 5) -> [String] {
+    let patternChars = pattern.lowercased()
+    var node = root
+    var i = patternChars.startIndex
+
+    while i < patternChars.endIndex {
+      guard let currentNode = node else { return [] }
+      let char = patternChars[i]
+      if char < currentNode.char {
+        node = currentNode.left
+      }
+      else if char > currentNode.char {
+        node = currentNode.right
+      }
+      else {
+        i = patternChars.index(after: i)
+        if i == patternChars.endIndex {
+          return Array(currentNode.words.prefix(maxResults))
+        }
+        node = currentNode.mid
+      }
+    }
+    return []
+  }
+
   // MARK: - Insertion
 
   func insert(_ word: String) {
@@ -56,47 +83,102 @@ final class SubsequenceTST {
           currentNode.left = Node(char)
         }
         node = currentNode.left
-      } else if char > currentNode.char {
+      }
+      else if char > currentNode.char {
         if currentNode.right == nil {
           currentNode.right = Node(char)
         }
         node = currentNode.right
-      } else {
+      }
+      else {
         i = chars.index(after: i)
         if i < chars.endIndex {
           if currentNode.mid == nil {
             currentNode.mid = Node(char)
           }
           node = currentNode.mid
-        } else {
+        }
+        else {
           currentNode.words.insert(originalWord)
         }
       }
     }
   }
 
-  // MARK: - Search
+  // MARK: - Enhanced Deletion
 
-  func search(_ pattern: String, maxResults: Int = 5) -> [String] {
-    let patternChars = pattern.lowercased()
-    var node = root
-    var i = patternChars.startIndex
+  /// Removes a word and all its subsequences from the tree
+  public func delete(_ word: String) {
+    guard allWords.contains(word) else { return }
 
-    while i < patternChars.endIndex {
-      guard let currentNode = node else { return [] }
-      let char = patternChars[i]
-      if char < currentNode.char {
-        node = currentNode.left
-      } else if char > currentNode.char {
-        node = currentNode.right
-      } else {
-        i = patternChars.index(after: i)
-        if i == patternChars.endIndex {
-          return Array(currentNode.words.prefix(maxResults))
-        }
-        node = currentNode.mid
-      }
+    let lowerWord = word.lowercased()
+    allWords.remove(word)
+
+    // Delete all subsequence entries
+    for subsequence in StringUtils.allSubsequences(of: lowerWord) {
+      deleteSubsequence(subsequence, originalWord: word)
     }
-    return []
+  }
+
+  private func deleteSubsequence(_ subsequence: String, originalWord: String) {
+    let chars = subsequence
+    guard !chars.isEmpty else { return }
+
+    var currentNode: Node? = root
+    var parentNodes = [Node]()  // Track the path
+    parentNodes.reserveCapacity(chars.count - 1)
+
+    var index = chars.startIndex
+    let lastIndex = chars.index(before: chars.endIndex)
+
+    // Invariant: parentNodes is empty || parentNodes.last! is a parent of node
+    while index < chars.endIndex, let node = currentNode {
+      if chars[index] < node.char {
+        currentNode = node.left
+      }
+      else if chars[index] > node.char {
+        currentNode = node.right
+      }
+      else {
+        // Found matching character
+        if index == lastIndex {
+          // Remove the word from this terminal node
+          node.words.remove(originalWord)
+          tryPrune(node: node, parentNodes: parentNodes)
+          return
+        }
+        index = chars.index(after: index)
+        currentNode = node.mid
+      }
+
+      parentNodes.append(node)
+    }
+  }
+
+  /// Attempts to prune empty nodes from the tree
+  @inline(__always)
+  private func tryPrune(node: Node, parentNodes: [Node]) {
+    guard !node.hasValue && !node.hasChild else { return }
+    var node: Node = node
+
+    // Invariant:
+    //  node is removeable
+    //  `parent` is parent of node
+    for parent in parentNodes.reversed() {
+      if parent.left === node {
+        parent.left = nil
+      }
+      else if parent.right === node {
+        parent.right = nil
+      }
+      else if parent.mid === node {
+        parent.mid = nil
+      }
+
+      guard !parent.hasValue && !parent.hasChild else { break }
+      node = parent
+    }
+
+    if node === root { root = nil }
   }
 }
