@@ -13,7 +13,7 @@ struct SubsequencePerformanceTests {
     let clock = ContinuousClock()
     var result: [String] = []
     let duration = clock.measure {
-      result = StringUtils.allSubsequences(of: input)
+      result = Satz.allSubsequences(of: input)
     }
 
     #expect(result.count == expectedCount)
@@ -28,7 +28,7 @@ struct SubsequencePerformanceTests {
     let clock = ContinuousClock()
     var result: [String] = []
     let duration = clock.measure {
-      result = StringUtils.allSubsequences(of: input)
+      result = Satz.allSubsequences(of: input)
     }
 
     #expect(result.count == expectedCount)
@@ -43,7 +43,7 @@ struct SubsequencePerformanceTests {
     let clock = ContinuousClock()
     var result: [String] = []
     let duration = clock.measure {
-      result = StringUtils.allSubsequences(of: input)
+      result = Satz.allSubsequences(of: input)
     }
 
     #expect(result.count == expectedCount)
@@ -58,7 +58,7 @@ struct SubsequencePerformanceTests {
     let clock = ContinuousClock()
     var result: [String] = []
     let duration = clock.measure {
-      result = StringUtils.allSubsequences(of: input)
+      result = Satz.allSubsequences(of: input)
     }
 
     #expect(result.count == expectedCount)
@@ -73,7 +73,7 @@ struct SubsequencePerformanceTests {
     let clock = ContinuousClock()
     var result: [String] = []
     let duration = clock.measure {
-      result = StringUtils.allSubsequences(of: input)
+      result = Satz.allSubsequences(of: input)
     }
 
     #expect(result.count == expectedCount)
