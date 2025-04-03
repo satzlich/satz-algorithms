@@ -42,30 +42,34 @@ public final class TSTree<Value> {
 
   /// Returns the value associated with the given key.
   public func get(_ key: String) -> Value? {
-    precondition(!key.isEmpty)
-    guard let node = get(root, key, key.startIndex) else { return nil }
-    return node.value
+    getNode(key)?.value
   }
 
-  /// Returns subtree corresponding to given key.
-  private func get(_ node: Node?, _ key: String, _ index: String.Index) -> Node? {
+  private func getNode(_ key: String) -> Node? {
     precondition(!key.isEmpty)
+    guard let root = root else { return nil }
 
-    guard let node else { return nil }
+    var currentNode: Node? = root
+    var currentIndex = key.startIndex
+    let lastIndex = key.index(before: key.endIndex)
 
-    let c = key[index]
-    if c < node.char {
-      return get(node.left, key, index)
+    while let node = currentNode, currentIndex < key.endIndex {
+      let c = key[currentIndex]
+
+      if c < node.char {
+        currentNode = node.left
+      } else if c > node.char {
+        currentNode = node.right
+      } else {
+        if currentIndex == lastIndex {
+          return node
+        }
+        currentIndex = key.index(after: currentIndex)
+        currentNode = node.mid
+      }
     }
-    else if c > node.char {
-      return get(node.right, key, index)
-    }
-    else if index < key.index(before: key.endIndex) {
-      return get(node.mid, key, key.index(after: index))
-    }
-    else {
-      return node
-    }
+
+    return nil
   }
 
   public func put(_ key: String, _ value: Value) {
@@ -90,14 +94,11 @@ public final class TSTree<Value> {
 
     if c < node.char {
       node.left = put(node.left, key, value, index)
-    }
-    else if c > node.char {
+    } else if c > node.char {
       node.right = put(node.right, key, value, index)
-    }
-    else if index < key.index(before: key.endIndex) {
+    } else if index < key.index(before: key.endIndex) {
       node.mid = put(node.mid, key, value, key.index(after: index))
-    }
-    else {
+    } else {
       if !node.hasValue { count += 1 }
       node.value = value
     }
@@ -133,8 +134,7 @@ public final class TSTree<Value> {
       else {
         return false
       }
-    }
-    else {
+    } else {
       let c = key[index]
       if c < node.char {
         let shouldDelete = delete(node.left, key, index)
@@ -143,16 +143,14 @@ public final class TSTree<Value> {
           return !node.hasValue && !node.hasChild
         }
         return false
-      }
-      else if c > node.char {
+      } else if c > node.char {
         let shouldDelete = delete(node.right, key, index)
         if shouldDelete {
           node.right = nil
           return !node.hasValue && !node.hasChild
         }
         return false
-      }
-      else {
+      } else {
         let shouldDelete = delete(node.mid, key, key.index(after: index))
         if shouldDelete {
           node.mid = nil
@@ -168,21 +166,19 @@ public final class TSTree<Value> {
     precondition(!query.isEmpty)
 
     var length: String.Index = query.startIndex
-    var node = root
+    var currentNode = root
     var index = query.startIndex
 
-    while let node_ = node, index < query.endIndex {
+    while let node = currentNode, index < query.endIndex {
       let c = query[index]
-      if c < node_.char {
-        node = node_.left
-      }
-      else if c > node_.char {
-        node = node_.right
-      }
-      else {
+      if c < node.char {
+        currentNode = node.left
+      } else if c > node.char {
+        currentNode = node.right
+      } else {
         index = query.index(after: index)
-        if node_.hasValue { length = index }
-        node = node_.mid
+        if node.hasValue { length = index }
+        currentNode = node.mid
       }
     }
     return query[query.startIndex..<length]
@@ -200,7 +196,7 @@ public final class TSTree<Value> {
   public func keysWithPrefix(_ prefix: String) -> [String] {
     precondition(!prefix.isEmpty)
 
-    guard let node = get(root, prefix, prefix.startIndex) else { return [] }
+    guard let node = getNode(prefix) else { return [] }
 
     var queue: [String] = []
 
@@ -253,14 +249,11 @@ public final class TSTree<Value> {
       collect(node.left, &prefix, pattern, index, &queue)
       collectMid()
       collect(node.right, &prefix, pattern, index, &queue)
-    }
-    else if c < node.char {
+    } else if c < node.char {
       collect(node.left, &prefix, pattern, index, &queue)
-    }
-    else if c == node.char {
+    } else if c == node.char {
       collectMid()
-    }
-    else if c > node.char {
+    } else if c > node.char {
       collect(node.right, &prefix, pattern, index, &queue)
     }
 
@@ -269,8 +262,7 @@ public final class TSTree<Value> {
 
       if index == lastIndex && node.hasValue {
         queue.append(prefix + String(node.char))
-      }
-      else if index < lastIndex {
+      } else if index < lastIndex {
         prefix.append(String(node.char))
         collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
         prefix.removeLast()
@@ -283,7 +275,7 @@ public final class TSTree<Value> {
     return lines.joined(separator: "\n")
   }
 
-  private func prettyPrint(_ node: Node?) -> Array<String> {
+  private func prettyPrint(_ node: Node?) -> [String] {
     guard let node else { return [] }
 
     let left = prettyPrint(node.left)

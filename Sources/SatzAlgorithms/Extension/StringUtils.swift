@@ -3,6 +3,7 @@
 import Foundation
 
 public enum StringUtils {
+  /// Generate all (non-empty) subsequences of a string.
   public static func allSubsequences(of string: String) -> [String] {
     var result: [String] = []
 
