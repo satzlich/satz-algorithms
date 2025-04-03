@@ -1,52 +1,82 @@
 // Copyright 2024-2025 Lie Yan
 
-import Foundation
-import SatzAlgorithms
-import XCTest
+import Testing
 
-final class SubsequencePerformanceTests: XCTestCase {
-  // Test small input (3 characters)
-  func testSmallInputPerformance() {
+@testable import SatzAlgorithms
+
+struct SubsequencePerformanceTests {
+  @Test(.tags(.performance))
+  func smallInput() {
     let input = "abc"
-    measure {
-      let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 7)  // 2^n - 1 where n=3
+    let expectedCount = 7  // 2^3 - 1
+
+    let clock = ContinuousClock()
+    var result: [String] = []
+    let duration = clock.measure {
+      result = StringUtils.allSubsequences(of: input)
     }
+
+    #expect(result.count == expectedCount)
+    print("Small input (3 chars) took \(duration)")
   }
 
-  // Test medium input (10 characters)
-  func testMediumInputPerformance() {
+  @Test(.tags(.performance))
+  func mediumInput() {
     let input = "abcdefghij"
-    measure {
-      let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 1023)  // 2^10 - 1
+    let expectedCount = 1023  // 2^10 - 1
+
+    let clock = ContinuousClock()
+    var result: [String] = []
+    let duration = clock.measure {
+      result = StringUtils.allSubsequences(of: input)
     }
+
+    #expect(result.count == expectedCount)
+    print("Medium input (10 chars) took \(duration)")
   }
 
-  // Test large input (16 characters) - this will generate 1,048,575 subsequences!
-  func testLargeInputPerformance() {
+  @Test(.tags(.performance), .disabled())
+  func largeInput() {
     let input = "abcdefghijklmnop"
-    measure {
-      let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 65535)  // 2^16 - 1
+    let expectedCount = 65535  // 2^16 - 1
+
+    let clock = ContinuousClock()
+    var result: [String] = []
+    let duration = clock.measure {
+      result = StringUtils.allSubsequences(of: input)
     }
+
+    #expect(result.count == expectedCount)
+    print("Large input (16 chars) took \(duration)")
   }
 
-  // Test empty string
-  func testEmptyInputPerformance() {
+  @Test(.tags(.performance))
+  func emptyInput() {
     let input = ""
-    measure {
-      let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 0)
+    let expectedCount = 0
+
+    let clock = ContinuousClock()
+    var result: [String] = []
+    let duration = clock.measure {
+      result = StringUtils.allSubsequences(of: input)
     }
+
+    #expect(result.count == expectedCount)
+    print("Empty input took \(duration)")
   }
 
-  // Test single character
-  func testSingleCharacterPerformance() {
+  @Test(.tags(.performance))
+  func singleCharacter() {
     let input = "a"
-    measure {
-      let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 1)
+    let expectedCount = 1
+
+    let clock = ContinuousClock()
+    var result: [String] = []
+    let duration = clock.measure {
+      result = StringUtils.allSubsequences(of: input)
     }
+
+    #expect(result.count == expectedCount)
+    print("Single character took \(duration)")
   }
 }

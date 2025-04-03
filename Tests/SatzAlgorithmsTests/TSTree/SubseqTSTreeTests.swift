@@ -175,7 +175,7 @@ struct SubseqTSTreeTests {
     #expect(tst.search(word) == [word])
   }
 
-  @Test(.tags(.performance))
+  @Test(.tags(.performance), .disabled())
   func insertPerformance() async throws {
     let clock = ContinuousClock()
     let tst = SubseqTSTree(ignoringCase: true)

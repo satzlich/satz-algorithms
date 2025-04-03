@@ -40,7 +40,7 @@ public final class TSTree<Value> {
   public func keys() -> [String] {
     var queue: [String] = []
     var prefix = ""
-    collect(root, &prefix, &queue)
+    _collect(root, &prefix, &queue)
     return queue
   }
 
@@ -221,7 +221,7 @@ public final class TSTree<Value> {
 
     if node.hasValue { queue.append(prefix) }
     var prefix = prefix
-    collect(node.mid, &prefix, &queue)
+    _collect(node.mid, &prefix, &queue)
     return queue
   }
 
@@ -288,29 +288,29 @@ public final class TSTree<Value> {
 
     var queue: [String] = []
     var prefix = ""
-    collect(root, &prefix, pattern, pattern.startIndex, &queue)
+    _collect(root, &prefix, pattern, pattern.startIndex, &queue)
     return queue
   }
 
   // MARK: - Collect
 
   /// all keys in subtrie rooted at node with given prefix
-  private func collect(_ node: Node?, _ prefix: inout String, _ queue: inout [String]) {
+  private func _collect(_ node: Node?, _ prefix: inout String, _ queue: inout [String]) {
     guard let node else { return }
 
-    collect(node.left, &prefix, &queue)
+    _collect(node.left, &prefix, &queue)
 
     do {
       if node.hasValue { queue.append(prefix + String(node.char)) }
       prefix.append(String(node.char))
-      collect(node.mid, &prefix, &queue)
+      _collect(node.mid, &prefix, &queue)
       prefix.removeLast()
     }
 
-    collect(node.right, &prefix, &queue)
+    _collect(node.right, &prefix, &queue)
   }
 
-  private func collect(
+  private func _collect(
     _ node: Node?, _ prefix: inout String,
     _ pattern: String, _ index: String.Index,
     _ queue: inout [String]
@@ -323,18 +323,18 @@ public final class TSTree<Value> {
     let wildCard: Character = "."
 
     if c == wildCard {
-      collect(node.left, &prefix, pattern, index, &queue)
+      _collect(node.left, &prefix, pattern, index, &queue)
       collectMid()
-      collect(node.right, &prefix, pattern, index, &queue)
+      _collect(node.right, &prefix, pattern, index, &queue)
     }
     else if c < node.char {
-      collect(node.left, &prefix, pattern, index, &queue)
+      _collect(node.left, &prefix, pattern, index, &queue)
     }
     else if c == node.char {
       collectMid()
     }
     else if c > node.char {
-      collect(node.right, &prefix, pattern, index, &queue)
+      _collect(node.right, &prefix, pattern, index, &queue)
     }
 
     @inline(__always) func collectMid() {
@@ -345,7 +345,7 @@ public final class TSTree<Value> {
       }
       else if index < lastIndex {
         prefix.append(String(node.char))
-        collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
+        _collect(node.mid, &prefix, pattern, pattern.index(after: index), &queue)
         prefix.removeLast()
       }
     }
