@@ -25,8 +25,7 @@ public final class TSTree<Value> {
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
 
-    @inline(__always) @inlinable
-    var hasValue: Bool { value != nil }
+    @inline(__always) var hasValue: Bool { value != nil }
 
     @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
@@ -271,7 +270,7 @@ public final class TSTree<Value> {
 
     guard let node = _getNode(prefix) else { return }
     if let value = node.value {
-      if block(prefix, value) == false { return }
+      if !block(prefix, value) { return }
     }
     var prefix = prefix
     _ = _enumerate(node.mid, &prefix, block)
