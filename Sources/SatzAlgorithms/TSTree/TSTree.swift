@@ -18,12 +18,8 @@ public final class TSTree<Value> {
     var right: Node?
     var value: Value?
 
-    init(char: Character, value: Value? = nil) {
+    init(char: Character) {
       self.char = char
-      self.value = value
-      self.left = nil
-      self.mid = nil
-      self.right = nil
     }
 
     @inline(__always) var hasChild: Bool { left != nil || mid != nil || right != nil }
@@ -42,10 +38,11 @@ public final class TSTree<Value> {
 
   /// Returns the value associated with the given key.
   public func get(_ key: String) -> Value? {
-    getNode(key)?.value
+    precondition(!key.isEmpty)
+    return _getNode(key)?.value
   }
 
-  private func getNode(_ key: String) -> Node? {
+  private func _getNode(_ key: String) -> Node? {
     precondition(!key.isEmpty)
     guard let root = root else { return nil }
 
@@ -72,9 +69,9 @@ public final class TSTree<Value> {
     return nil
   }
 
-  public func put(_ key: String, _ value: Value) {
+  public func insert(_ key: String, _ value: Value) {
     precondition(!key.isEmpty)
-    root = put(root, key, value, key.startIndex)
+    root = _insert(root, key, value, key.startIndex)
   }
 
   /// Inserts the key-value pair into the symbol table, overwriting the old value
@@ -83,7 +80,7 @@ public final class TSTree<Value> {
   ///
   /// ## Side Effect
   ///   `self.count` is incremented if the key is not found and inserted.
-  private func put(
+  private func _insert(
     _ node: Node?, _ key: String, _ value: Value, _ index: String.Index
   ) -> Node {
     precondition(!key.isEmpty)
@@ -93,11 +90,11 @@ public final class TSTree<Value> {
     let node: Node = node ?? Node(char: c)
 
     if c < node.char {
-      node.left = put(node.left, key, value, index)
+      node.left = _insert(node.left, key, value, index)
     } else if c > node.char {
-      node.right = put(node.right, key, value, index)
+      node.right = _insert(node.right, key, value, index)
     } else if index < key.index(before: key.endIndex) {
-      node.mid = put(node.mid, key, value, key.index(after: index))
+      node.mid = _insert(node.mid, key, value, key.index(after: index))
     } else {
       if !node.hasValue { count += 1 }
       node.value = value
@@ -196,7 +193,7 @@ public final class TSTree<Value> {
   public func keysWithPrefix(_ prefix: String) -> [String] {
     precondition(!prefix.isEmpty)
 
-    guard let node = getNode(prefix) else { return [] }
+    guard let node = _getNode(prefix) else { return [] }
 
     var queue: [String] = []
 
