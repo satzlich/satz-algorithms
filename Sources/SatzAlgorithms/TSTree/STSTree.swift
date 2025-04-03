@@ -62,13 +62,12 @@ public final class STSTree {
   public func search(_ pattern: String, using block: (Set<String>) -> Void) {
     precondition(!pattern.isEmpty)
 
-    let patternChars = pattern
     var node = root
-    var i = patternChars.startIndex
+    var i = pattern.startIndex
 
-    while i < patternChars.endIndex {
+    while i < pattern.endIndex {
       guard let currentNode = node else { return }
-      let char = patternChars[i]
+      let char = pattern[i]
       if char < currentNode.char {
         node = currentNode.left
       }
@@ -76,8 +75,8 @@ public final class STSTree {
         node = currentNode.right
       }
       else {
-        i = patternChars.index(after: i)
-        if i == patternChars.endIndex {
+        i = pattern.index(after: i)
+        if i == pattern.endIndex {
           block(currentNode.words)
           return
         }
