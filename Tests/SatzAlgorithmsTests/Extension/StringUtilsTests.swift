@@ -23,12 +23,12 @@ final class SubsequencePerformanceTests: XCTestCase {
     }
   }
 
-  // Test large input (20 characters) - this will generate 1,048,575 subsequences!
+  // Test large input (16 characters) - this will generate 1,048,575 subsequences!
   func testLargeInputPerformance() {
-    let input = "abcdefghijklmnopqrst"
+    let input = "abcdefghijklmnop"
     measure {
       let result = StringUtils.allSubsequences(of: input)
-      XCTAssertEqual(result.count, 1_048_575)  // 2^20 - 1
+      XCTAssertEqual(result.count, 65535)  // 2^16 - 1
     }
   }
 

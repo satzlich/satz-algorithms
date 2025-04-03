@@ -4,8 +4,8 @@ import Collections
 import Foundation
 
 /// A ternary search tree (TST) that stores subsequences of words.
-final class SubsequenceTST {
-  private final class Node {
+public final class SubseqTSTree {
+  internal final class Node {
     var char: Character
     var left: Node?
     var mid: Node?
@@ -23,13 +23,28 @@ final class SubsequenceTST {
     @inline(__always) var isRemoveable: Bool { !hasValue && !hasChild }
   }
 
-  private var root: Node?
-  private var allWords: Set<String> = []
+  private(set) var root: Node?
+  public private(set) var allWords: Set<String>
+  public let ignoringCase: Bool
+
+  /// Creates a new `SubseqTSTree` instance.
+  /// - Parameter ignoringCase: If true, search is case insensitive. Values are
+  ///     received and stored as is.
+  public init(ignoringCase: Bool) {
+    self.root = nil
+    self.allWords = []
+    self.ignoringCase = ignoringCase
+  }
+
+  public var isEmpty: Bool { allWords.isEmpty }
+  public var count: Int { allWords.count }
 
   // MARK: - Search
 
-  func search(_ pattern: String, maxResults: Int = 5) -> [String] {
-    let patternChars = pattern.lowercased()
+  public func search(_ pattern: String, maxResults: Int = 5) -> [String] {
+    precondition(!pattern.isEmpty)
+
+    let patternChars = ignoringCase ? pattern.lowercased() : pattern
     var node = root
     var i = patternChars.startIndex
 
@@ -55,9 +70,13 @@ final class SubsequenceTST {
 
   // MARK: - Insertion
 
-  func insert(_ word: String) {
+  public func insert(_ word: String) {
+    guard !word.isEmpty,
+      !allWords.contains(word)  // Avoid duplicates
+    else { return }
+
     allWords.insert(word)
-    let lowerWord = word.lowercased()
+    let lowerWord = ignoringCase ? word.lowercased() : word
 
     for subsequence in StringUtils.allSubsequences(of: lowerWord).shuffled() {
       insertSubsequence(subsequence, originalWord: word)
@@ -65,8 +84,8 @@ final class SubsequenceTST {
   }
 
   private func insertSubsequence(_ subsequence: String, originalWord: String) {
+    precondition(!subsequence.isEmpty)
     let chars = subsequence  // alias for convenience
-    guard !chars.isEmpty else { return }
 
     if root == nil {
       root = Node(chars.first!)
@@ -76,7 +95,8 @@ final class SubsequenceTST {
     var i = chars.startIndex
 
     while i < chars.endIndex {
-      guard let currentNode = node else { break }
+      guard let currentNode = node
+      else { assertionFailure("Node should not be nil"); return }
 
       let char = chars[i]
 
@@ -111,10 +131,8 @@ final class SubsequenceTST {
 
   /// Removes a word and all its subsequences from the tree
   public func delete(_ word: String) {
-    guard allWords.contains(word) else { return }
-
-    let lowerWord = word.lowercased()
-    allWords.remove(word)
+    guard allWords.remove(word) != nil else { return }
+    let lowerWord = ignoringCase ? word.lowercased() : word
 
     // Delete all subsequence entries
     for subsequence in StringUtils.allSubsequences(of: lowerWord) {
@@ -123,8 +141,8 @@ final class SubsequenceTST {
   }
 
   private func deleteSubsequence(_ subsequence: String, originalWord: String) {
+    precondition(!subsequence.isEmpty)
     let chars = subsequence
-    guard !chars.isEmpty else { return }
 
     var currentNode: Node? = root
     var parentNodes = [Node]()  // Track the path
@@ -181,6 +199,7 @@ final class SubsequenceTST {
       node = parent
     }
 
+    assert(node.isRemoveable)
     if node === root { root = nil }
   }
 }
