@@ -40,7 +40,7 @@ public struct NGramIndex {
     guard !grams.isEmpty else { return [] }
     var resultIDs: Set<Int>? = nil
 
-    for gram in grams {
+    for gram in Set(grams) {
       guard let docIDs = index[gram] else { return [] }
       resultIDs = resultIDs?.intersection(docIDs) ?? docIDs
     }
