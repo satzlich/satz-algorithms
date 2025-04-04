@@ -138,10 +138,11 @@ public final class Trie<Value> {
   ///   - n: The maximum number of results to return (default: .max).
   /// - Returns: An array of keys that start with the prefix.
   public func search(withPrefix prefix: String, maxResults n: Int = .max) -> [String] {
-    var results: [String] = []
-    guard let prefixNode = findPrefixNode(prefix)
-    else { return results }
+    guard n > 0,
+      let prefixNode = findPrefixNode(prefix)
+    else { return [] }
 
+    var results: [String] = []
     var quota = n
     enumerateFromNode(prefixNode, currentKey: prefix) { key, _ in
       results.append(key)
@@ -203,7 +204,7 @@ public final class Trie<Value> {
       if !block(currentKey, value) { return false }
     }
 
-    for (char, child) in node.children.sorted(by: { $0.key < $1.key }) {
+    for (char, child) in node.children {
       currentKey.append(char)
       defer { currentKey.removeLast() }
       if !enumerateFromNodeHelper(child, currentKey: &currentKey, using: block) {
@@ -235,6 +236,8 @@ public final class Trie<Value> {
     }
     else {
       if let child = node.children[patternChar] {
+        prefix.append(patternChar)
+        defer { prefix.removeLast() }
         searchPattern(pattern, pattern.index(after: index), child, &prefix, &results)
       }
     }
