@@ -35,7 +35,7 @@ struct TrieTests {
     #expect(tree.contains("red") == false)
 
     // keys()
-    #expect(tree.keys() == ["apple", "banana", "orange", "tomato"])
+    #expect(tree.keys().sorted() == ["apple", "banana", "orange", "tomato"])
 
     // remove()
     tree.delete("appl")
@@ -121,6 +121,7 @@ struct TrieTests {
       results.append((key, value))
       return true
     }
+    results.sort { $0.0 < $1.0 }
 
     #expect(
       "\(results)" == """

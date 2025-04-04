@@ -39,7 +39,7 @@ public final class Trie<Value> {
         if !block(prefix, value) { return false }
       }
 
-      for (char, child) in node.children.sorted(by: { $0.key < $1.key }) {
+      for (char, child) in node.children {  // unsorted
         prefix.append(char)
         defer { prefix.removeLast() }
         if !traverse(child, prefix: &prefix, block: block) { return false }
@@ -204,7 +204,7 @@ public final class Trie<Value> {
       if !block(currentKey, value) { return false }
     }
 
-    for (char, child) in node.children {
+    for (char, child) in node.children {  // unsorted
       currentKey.append(char)
       defer { currentKey.removeLast() }
       if !enumerateFromNodeHelper(child, currentKey: &currentKey, using: block) {
@@ -228,7 +228,7 @@ public final class Trie<Value> {
     let patternChar = pattern[index]
 
     if patternChar == "." {  // wildcard
-      for (char, child) in node.children {
+      for (char, child) in node.children { // unsorted
         prefix.append(char)
         defer { prefix.removeLast() }
         searchPattern(pattern, pattern.index(after: index), child, &prefix, &results)
