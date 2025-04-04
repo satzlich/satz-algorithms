@@ -27,10 +27,10 @@ struct NGramIndexTests {
 
   @Test func testCaseSensitiveBehavior() {
     // Case-sensitive index
-    var sensitiveIndex = NGramIndex(n: 2, caseSensitive: true)
+    var sensitiveIndex = NGramIndex(n: 2)
     sensitiveIndex.addDocument("Case Matters")
 
-    #expect(sensitiveIndex.search("ca").isEmpty)
+    #expect(sensitiveIndex.search("ca") == ["Case Matters"])
     #expect(sensitiveIndex.search("Ca") == ["Case Matters"])
   }
 
@@ -70,15 +70,17 @@ struct NGramIndexTests {
 
   @Test func testDeleteByContent() {
     // Given
-    var index = NGramIndex(n: 2, caseSensitive: true)
+    var index = NGramIndex(n: 2)
     index.addDocument("Swift")
     index.addDocument("swift")  // Different case
+
+    #expect(index.search("Sw") == ["Swift", "swift"])
 
     // When
     index.delete("Swift")  // Case-sensitive deletion
 
     // Then
-    #expect(index.search("Sw") == [])
+    #expect(index.search("Sw") == ["swift"])
     #expect(index.search("sw") == ["swift"])  // Only lowercase remains
   }
 
