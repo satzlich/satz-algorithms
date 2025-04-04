@@ -9,17 +9,14 @@ public struct NGramIndex {
   private(set) var documents: OrderedSet<String>
   private(set) var tombstoneIDs: Set<Int>
   public let n: Int
-  public let caseSensitive: Bool
 
   /// Creates a new n-gram index.
   /// - Parameters:
   ///   - n: The length of n-grams to use (default: 2).
-  ///   - caseSensitive: Whether to distinguish case (default: false).
   /// - Precondition: `n >= 2`
-  public init(n: Int = 2, caseSensitive: Bool = false) {
+  public init(n: Int = 2) {
     precondition(n >= 2)
     self.n = n
-    self.caseSensitive = caseSensitive
     self.index = [:]
     self.documents = []
     self.tombstoneIDs = []
@@ -32,9 +29,8 @@ public struct NGramIndex {
   /// - Returns: An array of matching documents in insertion order.
   /// - Note: Returns empty array if query is shorter than `n` or has no matches.
   public func search(_ query: String) -> [String] {
-    let normalizedQuery = caseSensitive ? query : query.lowercased()
-    let queryGrams = Satz.nGrams(of: normalizedQuery, n: n)
-
+    let query = query.lowercased()
+    let queryGrams = Satz.nGrams(of: query, n: n)
     var resultIDs = findMatchingDocumentIDs(for: queryGrams)
     resultIDs.subtract(tombstoneIDs)  // Filter out deleted docs
     return resultIDs.sorted().map { documents[$0] }
@@ -44,7 +40,7 @@ public struct NGramIndex {
     guard !grams.isEmpty else { return [] }
     var resultIDs: Set<Int>? = nil
 
-    for gram in grams {
+    for gram in Set(grams) {
       guard let docIDs = index[gram] else { return [] }
       resultIDs = resultIDs?.intersection(docIDs) ?? docIDs
     }
@@ -72,8 +68,7 @@ public struct NGramIndex {
     let docID = documents.count
     documents.append(text)
 
-    // normalize text before compute n-grams
-    let normalized = caseSensitive ? text : text.lowercased()
+    let normalized = text.lowercased()
     for gram in Satz.nGrams(of: normalized, n: n) {
       index[gram, default: []].insert(docID)
     }
@@ -96,7 +91,7 @@ public struct NGramIndex {
     else { return }
 
     let text = documents[documentID]
-    let normalized = caseSensitive ? text : text.lowercased()
+    let normalized = text.lowercased()
 
     // Remove all ngram references
     for gram in Satz.nGrams(of: normalized, n: n) {
@@ -123,8 +118,7 @@ public struct NGramIndex {
       .filter { !tombstoneIDs.contains($0.offset) }
       .map { $0.element }
 
-    self = NGramIndex(n: n, caseSensitive: caseSensitive)
-
-    survivors.forEach { _ = addDocument($0) }
+    self = NGramIndex(n: n)
+    self.addDocuments(survivors)
   }
 }
