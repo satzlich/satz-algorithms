@@ -17,6 +17,7 @@ public final class Trie<Value> {
 
   public init() {}
 
+  /// Returns the keys in the trie.
   public func keys() -> [String] {
     var results: [String] = []
     enumerateKeysAndValues { key, _ in
@@ -26,24 +27,27 @@ public final class Trie<Value> {
     return results
   }
 
+  /// Enumerates all key-value pairs in the trie.
+  /// - Parameters:
+  ///   - block: A closure that takes a key and value as parameters. The
+  ///     enumeration stops when the closure returns false.
   public func enumerateKeysAndValues(_ block: (Key, Value) -> Bool) {
-    func traverse(_ node: Node, currentKey: String, block: (Key, Value) -> Bool) -> Bool {
-      if let value = node.value, node.hasValue {
-        if !block(currentKey, value) {
-          return false
-        }
+    /// - Returns: true if the enumeration was completed successfully.
+    func traverse(_ node: Node, prefix: inout String, block: (Key, Value) -> Bool) -> Bool
+    {
+      if let value = node.value {
+        if !block(prefix, value) { return false }
       }
 
       for (char, child) in node.children.sorted(by: { $0.key < $1.key }) {
-        let newKey = currentKey + String(char)
-        if !traverse(child, currentKey: newKey, block: block) {
-          return false
-        }
+        prefix.append(char)
+        defer { prefix.removeLast() }
+        if !traverse(child, prefix: &prefix, block: block) { return false }
       }
       return true
     }
-
-    _ = traverse(root, currentKey: "", block: block)
+    var prefix: String = ""
+    _ = traverse(root, prefix: &prefix, block: block)
   }
 
   /// Returns true if the key exists in the trie.
@@ -53,35 +57,33 @@ public final class Trie<Value> {
 
   /// Returns the value associated with the key, or nil if the key is not found.
   public func get(_ key: String) -> Value? {
-    var currentNode = root
+    var node = root
     for char in key {
-      guard let nextNode = currentNode.children[char] else {
+      guard let nextNode = node.children[char] else {
         return nil
       }
-      currentNode = nextNode
+      node = nextNode
     }
-    return currentNode.value
+    return node.value
   }
 
   /// Inserts a key-value pair into the trie. If the key already exists, it
   /// updates the value.
   public func insert(_ key: String, _ value: Value) {
-    var currentNode = root
+    var node = root
     for char in key {
-      if let nextNode = currentNode.children[char] {
-        currentNode = nextNode
+      if let nextNode = node.children[char] {
+        node = nextNode
       }
       else {
         let newNode = Node()
-        currentNode.children[char] = newNode
-        currentNode = newNode
+        node.children[char] = newNode
+        node = newNode
       }
     }
 
-    if !currentNode.hasValue {
-      count += 1
-    }
-    currentNode.value = value
+    if !node.hasValue { count += 1 }
+    node.value = value
   }
 
   /// Deletes a key-value pair from the trie. If the key does not exist, it
@@ -111,18 +113,18 @@ public final class Trie<Value> {
 
   /// Finds the longest prefix of the query string that exists in the trie.
   public func findPrefix(of query: String) -> Substring {
-    var currentNode = root
+    var node = root
     var index = query.startIndex
     var length = query.startIndex
 
     for char in query {
-      guard let nextNode = currentNode.children[char] else {
+      guard let nextNode = node.children[char] else {
         break
       }
-      currentNode = nextNode
+      node = nextNode
       index = query.index(after: index)
 
-      if currentNode.hasValue {
+      if node.hasValue {
         length = index
       }
     }
@@ -162,7 +164,8 @@ public final class Trie<Value> {
   /// Searches for keys that match the given pattern.
   public func search(_ pattern: String) -> [String] {
     var results: [String] = []
-    searchPattern(pattern, node: root, currentKey: "", results: &results)
+    var prefix = ""
+    searchPattern(pattern, pattern.startIndex, root, &prefix, &results)
     return results
   }
 
@@ -170,14 +173,14 @@ public final class Trie<Value> {
 
   /// Finds the node corresponding to the end of the given prefix.
   private func findPrefixNode(_ prefix: String) -> Node? {
-    var currentNode = root
+    var node = root
     for char in prefix {
-      guard let nextNode = currentNode.children[char] else {
+      guard let nextNode = node.children[char] else {
         return nil
       }
-      currentNode = nextNode
+      node = nextNode
     }
-    return currentNode
+    return node
   }
 
   /// Enumerates all key-value pairs starting from the given node.
@@ -211,31 +214,28 @@ public final class Trie<Value> {
     return true
   }
 
+  /// Searches for keys that match the given pattern and appends them to the results.
   private func searchPattern(
     _ pattern: String, _ index: String.Index,
-    node: Node, prefix: inout String, results: inout [String]
+    _ node: Node, _ prefix: inout String, _ results: inout [String]
   ) {
     if pattern.endIndex == index {
       if node.hasValue { results.append(prefix) }
       return
     }
 
-    let currentChar = pattern[index]
+    let patternChar = pattern[index]
 
-    if currentChar == "." {  // wildcard
+    if patternChar == "." {  // wildcard
       for (char, child) in node.children {
         prefix.append(char)
         defer { prefix.removeLast() }
-        searchPattern(
-          pattern, pattern.index(after: index), node: child, prefix: &prefix,
-          results: &results)
+        searchPattern(pattern, pattern.index(after: index), child, &prefix, &results)
       }
     }
     else {
-      if let child = node.children[currentChar] {
-        searchPattern(
-          pattern, pattern.index(after: index), node: child, prefix: &prefix,
-          results: &results)
+      if let child = node.children[patternChar] {
+        searchPattern(pattern, pattern.index(after: index), child, &prefix, &results)
       }
     }
   }
