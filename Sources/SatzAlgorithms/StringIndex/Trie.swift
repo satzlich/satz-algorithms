@@ -20,10 +20,8 @@ public final class Trie<Value> {
   /// Returns the keys in the trie.
   public func keys() -> [String] {
     var results: [String] = []
-    enumerateKeysAndValues { key, _ in
-      results.append(key)
-      return true
-    }
+    var prefix = ""
+    _collect(_root, &prefix, &results)
     return results
   }
 
@@ -241,6 +239,24 @@ public final class Trie<Value> {
         defer { prefix.removeLast() }
         searchPattern(pattern, pattern.index(after: index), child, &prefix, &results)
       }
+    }
+  }
+
+  // MARK: - Private
+
+  /// Collect all keys in the subtree rooted at given node.
+  private func _collect(_ node: _Node?, _ prefix: inout String, _ results: inout [String])
+  {
+    guard let node = node else { return }
+
+    if node.hasValue {
+      results.append(prefix)
+    }
+
+    for (char, child) in node.children {  // unsorted
+      prefix.append(char)
+      defer { prefix.removeLast() }
+      _collect(child, &prefix, &results)
     }
   }
 }
