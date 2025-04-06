@@ -30,23 +30,8 @@ public final class Trie<Value> {
   ///   - block: A closure that takes a key and value as parameters. The
   ///     enumeration stops when the closure returns false.
   public func enumerateKeysAndValues(_ block: (Key, Value) -> Bool) {
-    /// - Returns: true if the enumeration was completed successfully.
-    func traverse(
-      _ node: _Node, prefix: inout String, block: (Key, Value) -> Bool
-    ) -> Bool {
-      if let value = node.value {
-        if !block(prefix, value) { return false }
-      }
-
-      for (char, child) in node.children {  // unsorted
-        prefix.append(char)
-        defer { prefix.removeLast() }
-        if !traverse(child, prefix: &prefix, block: block) { return false }
-      }
-      return true
-    }
     var prefix: String = ""
-    _ = traverse(_root, prefix: &prefix, block: block)
+    _ = _enumerate(_root, prefix: &prefix, using: block)
   }
 
   /// Returns true if the key exists in the trie.
@@ -56,14 +41,7 @@ public final class Trie<Value> {
 
   /// Returns the value associated with the key, or nil if the key is not found.
   public func get(_ key: String) -> Value? {
-    var node = _root
-    for char in key {
-      guard let nextNode = node.children[char] else {
-        return nil
-      }
-      node = nextNode
-    }
-    return node.value
+    _getNode(key)?.value
   }
 
   /// Inserts a key-value pair into the trie. If the key already exists, it
@@ -138,12 +116,13 @@ public final class Trie<Value> {
   /// - Returns: An array of keys that start with the prefix.
   public func search(withPrefix prefix: String, maxResults n: Int = .max) -> [String] {
     guard n > 0,
-      let prefixNode = findPrefixNode(prefix)
+      let node = _getNode(prefix)
     else { return [] }
 
     var results: [String] = []
     var quota = n
-    enumerateFromNode(prefixNode, currentKey: prefix) { key, _ in
+    var prefix = prefix
+    _ = _enumerate(node, prefix: &prefix) { key, _ in
       results.append(key)
       quota -= 1
       return quota > 0
@@ -157,8 +136,9 @@ public final class Trie<Value> {
   ///   - block: A closure that takes a key and value as parameters. The
   ///       enumeration stops when the closure returns false.
   public func enumerate(withPrefix prefix: String, using block: (String, Value) -> Bool) {
-    guard let prefixNode = findPrefixNode(prefix) else { return }
-    enumerateFromNode(prefixNode, currentKey: prefix, using: block)
+    guard let prefixNode = _getNode(prefix) else { return }
+    var prefix = prefix
+    _ = _enumerate(prefixNode, prefix: &prefix, using: block)
   }
 
   /// Searches for keys that match the given pattern.
@@ -172,7 +152,7 @@ public final class Trie<Value> {
   // MARK: - Private Helpers
 
   /// Finds the node corresponding to the end of the given prefix.
-  private func findPrefixNode(_ prefix: String) -> _Node? {
+  private func _getNode(_ prefix: String) -> _Node? {
     var node = _root
     for char in prefix {
       guard let nextNode = node.children[char] else {
@@ -184,31 +164,19 @@ public final class Trie<Value> {
   }
 
   /// Enumerates all key-value pairs starting from the given node.
-  /// The enumeration stops when the block returns false or when the maximum
-  /// number of results is reached.
-  private func enumerateFromNode(
-    _ node: _Node, currentKey: String, using block: (String, Value) -> Bool
-  ) {
-    var currentKey = currentKey
-    _ = enumerateFromNodeHelper(node, currentKey: &currentKey, using: block)
-  }
-
-  /// Enumerates all key-value pairs starting from the given node.
   /// The enumeration stops when the block returns false.
   /// - Returns: true if the enumeration was completed successfully.
-  private func enumerateFromNodeHelper(
-    _ node: _Node, currentKey: inout String, using block: (String, Value) -> Bool
+  private func _enumerate(
+    _ node: _Node, prefix: inout String, using block: (String, Value) -> Bool
   ) -> Bool {
     if let value = node.value {
-      if !block(currentKey, value) { return false }
+      if !block(prefix, value) { return false }
     }
 
     for (char, child) in node.children {  // unsorted
-      currentKey.append(char)
-      defer { currentKey.removeLast() }
-      if !enumerateFromNodeHelper(child, currentKey: &currentKey, using: block) {
-        return false
-      }
+      prefix.append(char)
+      defer { prefix.removeLast() }
+      if !_enumerate(child, prefix: &prefix, using: block) { return false }
     }
 
     return true
