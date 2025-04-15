@@ -3,21 +3,19 @@
 import Collections
 import Foundation
 
-/// An index that enables efficient substring search using n-grams.
-@available(*, renamed: "InvertedIndex")
-public struct NGramIndex {
+/// An inverted index for n-grams.
+public struct InvertedIndex {
   private var index: [String: Set<Int>]
   private(set) var documents: OrderedSet<String>
   private(set) var tombstoneIDs: Set<Int>
-  public let n: Int
+  public let gramSize: Int
 
   /// Creates a new n-gram index.
-  /// - Parameters:
-  ///   - n: The length of n-grams to use (default: 2).
-  /// - Precondition: `n >= 2`
-  public init(n: Int = 2) {
-    precondition(n >= 2)
-    self.n = n
+  /// - Parameter gramSize: The length of n-grams to use (default: 2).
+  /// - Precondition: `gramSize >= 2`
+  public init(gramSize: Int = 2) {
+    precondition(gramSize >= 2)
+    self.gramSize = gramSize
     self.index = [:]
     self.documents = []
     self.tombstoneIDs = []
@@ -31,7 +29,7 @@ public struct NGramIndex {
   /// - Note: Returns empty array if query is shorter than `n` or has no matches.
   public func search(_ query: String) -> [String] {
     let query = query.lowercased()
-    let queryGrams = Satz.nGrams(of: query, n: n)
+    let queryGrams = Satz.nGrams(of: query, n: gramSize)
     var resultIDs = findMatchingDocumentIDs(for: queryGrams)
     resultIDs.subtract(tombstoneIDs)  // Filter out deleted docs
     return resultIDs.sorted().map { documents[$0] }
@@ -53,7 +51,7 @@ public struct NGramIndex {
   /// - Parameter gram: The exact n-gram to search for (must match `n` length).
   /// - Returns: Matching documents or empty array if gram length ≠ `n`.
   public func search(withGram gram: String) -> [String] {
-    guard gram.count == n else { return [] }
+    guard gram.count == gramSize else { return [] }
     return index[gram]?.map { documents[$0] } ?? []
   }
 
@@ -70,7 +68,7 @@ public struct NGramIndex {
     documents.append(text)
 
     let normalized = text.lowercased()
-    for gram in Satz.nGrams(of: normalized, n: n) {
+    for gram in Satz.nGrams(of: normalized, n: gramSize) {
       index[gram, default: []].insert(docID)
     }
 
@@ -95,7 +93,7 @@ public struct NGramIndex {
     let normalized = text.lowercased()
 
     // Remove all ngram references
-    for gram in Satz.nGrams(of: normalized, n: n) {
+    for gram in Satz.nGrams(of: normalized, n: gramSize) {
       index[gram]?.remove(documentID)
       if index[gram]?.isEmpty == true {
         index.removeValue(forKey: gram)
@@ -119,7 +117,7 @@ public struct NGramIndex {
       .filter { !tombstoneIDs.contains($0.offset) }
       .map { $0.element }
 
-    self = NGramIndex(n: n)
+    self = InvertedIndex(gramSize: gramSize)
     self.addDocuments(survivors)
   }
 }
