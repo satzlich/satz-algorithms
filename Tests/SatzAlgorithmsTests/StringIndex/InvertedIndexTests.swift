@@ -5,10 +5,10 @@ import Testing
 
 @testable import SatzAlgorithms
 
-struct NGramIndexTests {
+struct InvertedIndexTests {
   @Test
-  static func testNGramIndexBasicOperations() {
-    var index = NGramIndex(n: 3)
+  static func testInvertedIndexBasicOperations() {
+    var index = InvertedIndex(gramSize: 3)
     index.addDocument("The Great Gatsby")
     index.addDocument("The C Programming Language")
     index.addDocument("1984")
@@ -27,7 +27,7 @@ struct NGramIndexTests {
 
   @Test func testCaseSensitiveBehavior() {
     // Case-sensitive index
-    var sensitiveIndex = NGramIndex(n: 2)
+    var sensitiveIndex = InvertedIndex(gramSize: 2)
     sensitiveIndex.addDocument("Case Matters")
 
     #expect(sensitiveIndex.search("ca") == ["Case Matters"])
@@ -35,7 +35,7 @@ struct NGramIndexTests {
   }
 
   @Test func testEdgeCases() {
-    var index = NGramIndex(n: 3)
+    var index = InvertedIndex(gramSize: 3)
     #expect(index.search("").isEmpty)
     #expect(index.search(withGram: "ab").isEmpty)
 
@@ -44,7 +44,7 @@ struct NGramIndexTests {
   }
 
   @Test func testUnicodeHandling() {
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     index.addDocument("Café ☕")
 
     #expect(index.search("fé") == ["Café ☕"])
@@ -53,7 +53,7 @@ struct NGramIndexTests {
 
   @Test func testDeleteByDocumentID() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     let id1 = index.addDocument("Swift")
     index.addDocument("Python")
     index.addDocument("Java")
@@ -70,7 +70,7 @@ struct NGramIndexTests {
 
   @Test func testDeleteByContent() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     index.addDocument("Swift")
     index.addDocument("swift")  // Different case
 
@@ -86,7 +86,7 @@ struct NGramIndexTests {
 
   @Test func testCompactReclaimsSpace() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     let ids = (0..<5).map { index.addDocument("doc\($0)") }
     index.delete(documentID: ids[1])
     index.delete(documentID: ids[3])
@@ -104,7 +104,7 @@ struct NGramIndexTests {
 
   @Test func testCompactPreservesOrder() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     let texts = ["AA", "BB", "CC", "DD"]
     texts.forEach { index.addDocument($0) }
     index.delete(documentID: 1)  // Delete "BB"
@@ -118,7 +118,7 @@ struct NGramIndexTests {
 
   @Test func testIdempotentDeletion() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
     let id = index.addDocument("Test")
 
     // When (multiple deletes)
@@ -132,7 +132,7 @@ struct NGramIndexTests {
 
   @Test func testEmptyCompactIsSafe() {
     // Given
-    var index = NGramIndex(n: 2)
+    var index = InvertedIndex(gramSize: 2)
 
     // When (compact with no deletions)
     index.compact()
