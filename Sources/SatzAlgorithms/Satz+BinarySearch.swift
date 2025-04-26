@@ -42,7 +42,7 @@ extension Satz {
     return first
   }
 
-  /// Search for the first element that is ordered before `value`.
+  /// Search for the first element that is __not__ ordered before `value`.
   /// If there is no such element, return `elements.count`.
   /// - Complexity: O(log n)
   /// - Precondition: `elements` is sorted.
