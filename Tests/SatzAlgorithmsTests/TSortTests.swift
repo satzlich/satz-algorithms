@@ -7,7 +7,7 @@ import Testing
 private typealias TSortFunction<V: Hashable> =
   @Sendable (_ vertices: Set<V>, _ edges: [Arc<V>]) -> [V]?
 
-private let tsortFunctions: [TSortFunction<Int>] = [
+private let tsortFunctions: Array<TSortFunction<Int>> = [
   Satz.tsort,
   Satz.AlgorithmT.tsort,
   Satz.KanhAlgorithm.tsort,

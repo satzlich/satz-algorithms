@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -18,7 +18,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-algorithms", from: "1.2.0"),
-    .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.2"),
+    .package(url: "https://github.com/apple/swift-collections.git", from: "1.2.0"),
     .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
   ],
   targets: [
