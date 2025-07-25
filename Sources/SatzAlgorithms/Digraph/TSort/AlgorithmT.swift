@@ -1,5 +1,3 @@
-// Copyright 2024-2025 Lie Yan
-
 import Foundation
 
 /** Algorithm T for topological sort (TAOCP 2.2.3) */

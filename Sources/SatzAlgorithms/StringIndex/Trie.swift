@@ -1,5 +1,3 @@
-// Copyright 2024-2025 Lie Yan
-
 public final class Trie<Value> {
 
   private final class _Node {

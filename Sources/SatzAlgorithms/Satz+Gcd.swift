@@ -1,5 +1,3 @@
-// Copyright 2024-2025 Lie Yan
-
 extension Satz {
     /// Given two positive integers m and n, find their greatest common divisor.
     @inlinable
